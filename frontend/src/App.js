@@ -1,8 +1,8 @@
 // src/App.js
 
 import React from 'react';
-import SignIn from './Pages/SignIn';
-import Dashboard from './Pages/TenantDashboard';
+import SignIn from './pages/SignIn';
+import Dashboard from './pages/TenantDashboard';
 
 function App() {
   return (
