@@ -1,22 +1,57 @@
-import React from "react";
+import React, { useState } from "react";
 import './LoginForm.css';
 import { FaUser } from "react-icons/fa";
 import { FaLock } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { IoIosMail } from "react-icons/io";
 
-
 const LoginForm = () => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const navigate = useNavigate();
+
+    const handleEmailChange = (e) => {
+        setEmail(e.target.value);
+    };
+
+    const handlePasswordChange = (e) => {
+        setPassword(e.target.value);
+    };
+
+    const handleLogin = (e) => {
+        e.preventDefault();
+        // Dummy verification
+        if (email === 'hello@gmail.com' && password === 'hello123') {
+            // Redirect to HomePage
+            navigate('/home');
+        } else {
+            // Handle incorrect credentials (show error message, etc.)
+            alert('Incorrect email or password');
+        }
+    };
+
     return (
         <div className='wrapper'>
-            <form action="">
+            <form onSubmit={handleLogin}>
                 <h1>Login</h1>
                 <div className="input-box">
-                    <input type="email" placeholder="Email" required></input>
+                    <input
+                        type="email"
+                        placeholder="Email"
+                        value={email}
+                        onChange={handleEmailChange}
+                        required
+                    />
                     <IoIosMail className="icon"/>
                 </div>
                 <div className="input-box">
-                    <input type="password" placeholder="Password" required></input>
+                    <input
+                        type="password"
+                        placeholder="Password"
+                        value={password}
+                        onChange={handlePasswordChange}
+                        required
+                    />
                     <FaLock className="icon"/>
                 </div>
                 <div className="remember-forgot">
