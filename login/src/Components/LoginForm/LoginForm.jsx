@@ -3,6 +3,7 @@ import './LoginForm.css';
 import { FaUser } from "react-icons/fa";
 import { FaLock } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import { IoIosMail } from "react-icons/io";
 
 
 const LoginForm = () => {
@@ -12,7 +13,7 @@ const LoginForm = () => {
                 <h1>Login</h1>
                 <div className="input-box">
                     <input type="email" placeholder="Email" required></input>
-                    <FaUser className="icon"/>
+                    <IoIosMail className="icon"/>
                 </div>
                 <div className="input-box">
                     <input type="password" placeholder="Password" required></input>

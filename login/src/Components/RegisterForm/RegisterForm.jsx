@@ -1,11 +1,18 @@
-import React from "react";
+import React, { useState } from "react";
 import './RegisterForm.css';
 import { FaUser } from "react-icons/fa";
 import { FaLock } from "react-icons/fa";
 import { FaPhone } from "react-icons/fa";
+import { IoIosMail } from "react-icons/io";
 import { Link } from "react-router-dom";
 
 const RegisterForm = () => {
+    const [userType, setUserType] = useState('');
+
+    const handleUserTypeChange = (e) => {
+        setUserType(e.target.value);
+    };
+
     return (
         <div className='wrapper'>
             <form action="">
@@ -26,8 +33,17 @@ const RegisterForm = () => {
                 </div>
 
                 <div className="input-box">
-                    <input type="email" placeholder="Email" required></input>
+                    <select value={userType} onChange={handleUserTypeChange} required>
+                        <option value="" disabled>Select your role</option>
+                        <option value="tenant">Tenant</option>
+                        <option value="landlord">Landlord</option>
+                    </select>
                     <FaUser className="icon"/>
+                </div>
+
+                <div className="input-box">
+                    <input type="email" placeholder="Email" required></input>
+                    <IoIosMail className="icon"/>
                 </div>
                 <div className="input-box">
                     <input type="password" placeholder="Password" required></input>
