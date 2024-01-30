@@ -1,18 +1,21 @@
 import { Fragment } from 'react'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { useState } from 'react'
+import Groups from '../Components/Groups'
+import Cards from '../Components/Cards'
+import Tours from '../Components/MyTours'
 const user = {
   name: 'Tom Cook',
   email: 'tom@example.com',
   imageUrl:
     'https://media.licdn.com/dms/image/C5603AQFZmW2Nm7k2AQ/profile-displayphoto-shrink_800_800/0/1663648587937?e=2147483647&v=beta&t=lKfL6zxaowtklDGfMJw1jMrpkFHQd4YC4t3ADVv0ef0',
 }
-const navigation = [
-  { name: 'Dashboard', href: '#', current: true },
-  { name: 'Housing Near Me', href: '#', current: false },
-  { name: 'My Current Housing', href: '#', current: false },
+const initialNavigation = [
+  // { name: 'Dashboard', href: '#', current: true },
+  { name: 'Housing Near Me', href: '#', current: true },
+  { name: 'My Groups', href: '#', current: false },
   { name: 'My Tours', href: '#', current: false },
-  { name: 'Payment', href: '#', current: false },
 ]
 const userNavigation = [
   { name: 'Your Profile', href: '#' },
@@ -24,7 +27,33 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-export default function Dashboard() {
+export default function TenantDashboard() {
+  const [navigation, setNavigation] = useState(initialNavigation);
+
+  const handleNavigationClick = (clickedIndex) => {
+    const updatedNavigation = navigation.map((item, index) => ({
+      ...item,
+      current: index === clickedIndex,
+    }));
+    setNavigation(updatedNavigation);
+  };
+  const getContentComponent = () => {
+    // Find the current navigation item
+    const currentItem = navigation.find(item => item.current);
+
+    // Return the corresponding component based on the current navigation item
+    switch (currentItem.name) {
+      case 'My Groups':
+        return <Groups />;
+      case 'Housing Near Me':
+        return <Cards />;
+      case "My Tours":
+        return <Tours />;
+      // Add cases for other navigation items if needed
+      default:
+        return null; // Render nothing if no match found
+    }
+  };
   return (
     <>
       <div className="min-h-full">
@@ -37,13 +66,13 @@ export default function Dashboard() {
                     <div className="flex-shrink-0">
                       <img
                         className="h-8 w-8"
-                        src="/logo192.png"
+                        src="/housifylogo.png"
                         alt="Your Company"
                       />
                     </div>
                     <div className="hidden md:block">
                       <div className="ml-10 flex items-baseline space-x-4">
-                        {navigation.map((item) => (
+                        {navigation.map((item, index) => (
                           <a
                             key={item.name}
                             href={item.href}
@@ -54,6 +83,7 @@ export default function Dashboard() {
                               'rounded-md px-3 py-2 text-sm font-medium'
                             )}
                             aria-current={item.current ? 'page' : undefined}
+                            onClick={() => handleNavigationClick(index)} // Added onClick handl
                           >
                             {item.name}
                           </a>
@@ -181,12 +211,15 @@ export default function Dashboard() {
 
         <header className="bg-white shadow">
           <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-            <h1 className="text-3xl font-bold tracking-tight text-gray-900">Dashboard</h1>
           </div>
         </header>
         <main>
-          <div className="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">{/* Your content */}</div>
+          <div className="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">{
+              /* Your content */
+              getContentComponent()
+            }</div>
         </main>
+
       </div>
     </>
   )

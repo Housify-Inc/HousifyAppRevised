@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Housify",
+  "name": "A one Stop Shop for all your Rental Needs",
   "icons": [
     {
       "src": "favicon.ico",
