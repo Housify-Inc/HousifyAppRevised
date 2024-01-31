@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import './LoginForm.css';
-import { FaUser } from "react-icons/fa";
 import { FaLock } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { IoIosMail } from "react-icons/io";
@@ -18,17 +17,33 @@ const LoginForm = () => {
         setPassword(e.target.value);
     };
 
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
+
+    
+        // Construct the URL with query parameters
+        const loginUrl = `http://localhost:8090/login?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`;
+    
+        // Make a GET request to your Flask API endpoint with query parameters
+        const response = await fetch(loginUrl, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+    
+        const responseData = await response.json();
+    
         // Dummy verification
-        if (email === 'hello@gmail.com' && password === 'hello123') {
+        if (response.ok) {
             // Redirect to HomePage
             navigate('/home');
         } else {
             // Handle incorrect credentials (show error message, etc.)
-            alert('Incorrect email or password');
+            alert(responseData.error || 'Something went wrong');
         }
     };
+    
 
     return (
         <div className='wrapper'>
