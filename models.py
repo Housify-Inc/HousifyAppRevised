@@ -3,9 +3,12 @@ from Exceptions import UnexpectedLogicException
 from pymongo import MongoClient
 
 class User:
-    def __init__(self, username, password, payment_info, user_type, additional_fields=None):
+    def __init__(self, username, password, first_name, last_name, phone_number, payment_info, user_type, additional_fields=None):
         self.username = username
         self.password = password
+        self.first_name = first_name
+        self.last_name = last_name
+        self.phone_number = phone_number
         self.payment_info = payment_info
         self.user_type = user_type
         self.additional_fields = additional_fields or {}
@@ -17,6 +20,9 @@ class User:
             username=user_dict.get('username'),
             password=user_dict.get('password'),
             payment_info=user_dict.get('payment_info'),
+            first_name=user_dict.get('first_name'),
+            last_name=user_dict.get('last_name'),
+            phone_number=user_dict.get('phone_number'),
             user_type=user_dict.get('user_type'),
             additional_fields=user_dict.get('additional_fields')
         )
@@ -27,7 +33,7 @@ class User:
     
     # @classmethod
     def retrieve_user_info(self, username): #access database for complete user info
-        connection_string = "mongodb+srv://21aravindnair:harambe@userpasswords.pxdm1kt.mongodb.net/"
+        connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
         client = MongoClient(connection_string)
         db = client.UserInformation
         collection = db.UserProfiles
@@ -70,7 +76,7 @@ class User:
     
     # @classmethod
     def update_profile_password(self, new_password, username=None):
-        connection_string = "mongodb+srv://21aravindnair:harambe@userpasswords.pxdm1kt.mongodb.net/"
+        connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
         client = MongoClient(connection_string)
         db = client.UserInformation
         collection = db.UserProfiles
@@ -83,7 +89,7 @@ class User:
 
     # @classmethod
     def update_profile_payment_info(self, new_payment_info, username=None):
-        connection_string = "mongodb+srv://21aravindnair:harambe@userpasswords.pxdm1kt.mongodb.net/"
+        connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
         client = MongoClient(connection_string)
         db = client.UserInformation
         collection = db.UserProfiles
@@ -105,7 +111,7 @@ class User:
     
     #FLAG FLAG FLAG FLAG FLAG FLAG FLAG FLAG FLAG FLAG FLAG FLAG FLAG FLAG
     def add_user_info(self): #inserts user info into database
-        connection_string = "mongodb+srv://21aravindnair:harambe@userpasswords.pxdm1kt.mongodb.net/"
+        connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
         client = MongoClient(connection_string)
         db = client.UserInformation
         collection = db.UserProfiles
@@ -116,7 +122,7 @@ class User:
         client.close()
             
     def delete_user(self):
-        connection_string = "mongodb+srv://21aravindnair:harambe@userpasswords.pxdm1kt.mongodb.net/"
+        connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
         client = MongoClient(connection_string)
         db = client.UserInformation
         collection = db.UserProfiles
@@ -126,7 +132,7 @@ class User:
         client.close()
 
     def validate_username(self):
-        connection_string = "mongodb+srv://21aravindnair:harambe@userpasswords.pxdm1kt.mongodb.net/"
+        connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
         client = MongoClient(connection_string)
         db = client.UserInformation
         collection = db.UserProfiles
@@ -163,7 +169,7 @@ class Landlord(User):
 
     # @classmethod
     def insert_landlord_info(self):
-        connection_string = "mongodb+srv://21aravindnair:harambe@userpasswords.pxdm1kt.mongodb.net/"
+        connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
         client = MongoClient(connection_string)
         db = client.UserInformation
         collection = db.UserProfiles
@@ -176,7 +182,7 @@ class Landlord(User):
 
     # @classmethod
     def retrieve_landlord_info(self, username=None): #access database for all tenant data; use other getters to access information/just access once to get 
-        connection_string = "mongodb+srv://21aravindnair:harambe@userpasswords.pxdm1kt.mongodb.net/"
+        connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
         client = MongoClient(connection_string)
         db = client.UserInformation
         collection = db.UserProfiles
@@ -191,7 +197,7 @@ class Landlord(User):
     
     def get_my_properties(self):
         # Access the database to retrieve my_properties
-        connection_string = "mongodb+srv://21aravindnair:harambe@userpasswords.pxdm1kt.mongodb.net/"
+        connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
         client = MongoClient(connection_string)
         db = client.UserInformation
         collection = db.UserProfiles
@@ -210,7 +216,7 @@ class Landlord(User):
             self.additional_fields["my_properties"].remove(address)
 
         # Update the database with the modified Landlord data
-        connection_string = "mongodb+srv://21aravindnair:harambe@userpasswords.pxdm1kt.mongodb.net/"
+        connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
         client = MongoClient(connection_string)
         db = client.UserInformation
         collection = db.UserProfiles
@@ -261,7 +267,7 @@ class Tenant(User): #Tenant is subclass to User
 
     # @classmethod
     def insert_tenant_info(self):
-        connection_string = "mongodb+srv://21aravindnair:harambe@userpasswords.pxdm1kt.mongodb.net/"
+        connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
         client = MongoClient(connection_string)
         db = client.UserInformation
         collection = db.UserProfiles
@@ -274,7 +280,7 @@ class Tenant(User): #Tenant is subclass to User
 
     # @classmethod
     def retrieve_tenant_info(self): #access database for all tenant data; use other getters to access information/just access once to get 
-        connection_string = "mongodb+srv://21aravindnair:harambe@userpasswords.pxdm1kt.mongodb.net/"
+        connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
         client = MongoClient(connection_string)
         db = client.UserInformation
         collection = db.UserProfiles
