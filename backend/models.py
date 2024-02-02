@@ -2,33 +2,41 @@ from Exceptions import UserNotFoundException
 from Exceptions import UnexpectedLogicException
 from pymongo import MongoClient
 import certifi
-
 ca = certifi.where()
 
 
-
 class User:
-    def __init__(self, username, password, payment_info, user_type, additional_fields=None):
+    def __init__(self, username, password, first_name, last_name, phone_number, payment_info, user_type, additional_fields=None):
         self.username = username
         self.password = password
+        self.first_name = first_name
+        self.last_name = last_name
+        self.phone_number = phone_number
         self.payment_info = payment_info
         self.user_type = user_type
         self.additional_fields = additional_fields or {}
 
+
+    # @classmethod
     def from_dict(self, user_dict):
         return self.__class__(
             username=user_dict.get('username'),
             password=user_dict.get('password'),
             payment_info=user_dict.get('payment_info'),
+            first_name=user_dict.get('first_name'),
+            last_name=user_dict.get('last_name'),
+            phone_number=user_dict.get('phone_number'),
             user_type=user_dict.get('user_type'),
             additional_fields=user_dict.get('additional_fields')
         )
-
+    
+    # @classmethod
     def to_dict(self):
         return {key: value for key, value in self.__dict__.items() if not key.startswith("--")}
     
+    # @classmethod
     def retrieve_user_info(self, username): #access database for complete user info
-        connection_string = "mongodb+srv://21aravindnair:harambe@userpasswords.pxdm1kt.mongodb.net/"
+        connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
         client = MongoClient(connection_string, tlsCaFile=ca) 
         db = client.UserInformation
         collection = db.UserProfiles
@@ -42,6 +50,7 @@ class User:
 
         return self.from_dict(user)
     
+    # @classmethod
     def get_password(self, username=None): #access database for password
         if username is None:
             self.password = self.retrieve_user_info(self.username).password
@@ -50,6 +59,7 @@ class User:
             self.password = self.retrieve_user_info(username).password
             return self.password
     
+    # @classmethod
     def get_payment_info(self, username=None): #access database for password
         if username is None:
             self.payment_info = self.retrieve_user_info(self.username).payment_info
@@ -57,7 +67,8 @@ class User:
         else:
             self.payment_info = self.retrieve_user_info(username).payment_info
             return self.payment_info
-   
+
+    # @classmethod    
     def get_user_type(self, username=None): #access database for user type
         if username is None:
             self.user_type = self.retrieve_user_info(self.username).user_type
@@ -66,8 +77,9 @@ class User:
             self.user_type = self.retrieve_user_info(username).user_type
             return self.user_type 
     
+    # @classmethod
     def update_profile_password(self, new_password, username=None):
-        connection_string = "mongodb+srv://21aravindnair:harambe@userpasswords.pxdm1kt.mongodb.net/"
+        connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
         client = MongoClient(connection_string, tlsCaFile=ca) 
         db = client.UserInformation
         collection = db.UserProfiles
@@ -78,8 +90,9 @@ class User:
         
         client.close()
 
+    # @classmethod
     def update_profile_payment_info(self, new_payment_info, username=None):
-        connection_string = "mongodb+srv://21aravindnair:harambe@userpasswords.pxdm1kt.mongodb.net/"
+        connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
         client = MongoClient(connection_string, tlsCaFile=ca) 
         db = client.UserInformation
         collection = db.UserProfiles
@@ -90,6 +103,7 @@ class User:
         
         client.close()
         
+    # @classmethod
     def print_user_info(self):
         print("User Information:")
         print(f"Username: {self.username}")
@@ -98,8 +112,9 @@ class User:
         print(f"User Type: {self.user_type}")
         print(f"Additional Fields: {self.additional_fields}")
     
+    #FLAG FLAG FLAG FLAG FLAG FLAG FLAG FLAG FLAG FLAG FLAG FLAG FLAG FLAG
     def add_user_info(self): #inserts user info into database
-        connection_string = "mongodb+srv://21aravindnair:harambe@userpasswords.pxdm1kt.mongodb.net/"
+        connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
         client = MongoClient(connection_string, tlsCaFile=ca) 
         db = client.UserInformation
         collection = db.UserProfiles
@@ -110,7 +125,7 @@ class User:
         client.close()
             
     def delete_user(self):
-        connection_string = "mongodb+srv://21aravindnair:harambe@userpasswords.pxdm1kt.mongodb.net/"
+        connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
         client = MongoClient(connection_string, tlsCaFile=ca) 
         db = client.UserInformation
         collection = db.UserProfiles
@@ -120,7 +135,7 @@ class User:
         client.close()
 
     def validate_username(self):
-        connection_string = "mongodb+srv://21aravindnair:harambe@userpasswords.pxdm1kt.mongodb.net/"
+        connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
         client = MongoClient(connection_string, tlsCaFile=ca) 
         db = client.UserInformation
         collection = db.UserProfiles
@@ -142,6 +157,7 @@ class Landlord(User):
         super().__init__(username, password, payment_info, "landlord")
         self.additional_fields["my_properties"] = my_properties
 
+    # @classmethod
     def from_dict(self, landlord_dict):
         return self.__class__(
             username=landlord_dict.get('username'),
@@ -150,11 +166,13 @@ class Landlord(User):
             my_properties=landlord_dict.get('additional_fields', {}).get('my_properties', [])
         )
     
+    # @classmethod
     def to_dict(self):
         return {key: value for key, value in self.__dict__.items() if not key.startswith("--")}
 
+    # @classmethod
     def insert_landlord_info(self):
-        connection_string = "mongodb+srv://21aravindnair:harambe@userpasswords.pxdm1kt.mongodb.net/"
+        connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
         client = MongoClient(connection_string, tlsCaFile=ca) 
         db = client.UserInformation
         collection = db.UserProfiles
@@ -165,8 +183,9 @@ class Landlord(User):
         
         client.close()
 
+    # @classmethod
     def retrieve_landlord_info(self, username=None): #access database for all tenant data; use other getters to access information/just access once to get 
-        connection_string = "mongodb+srv://21aravindnair:harambe@userpasswords.pxdm1kt.mongodb.net/"
+        connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
         client = MongoClient(connection_string, tlsCaFile=ca) 
         db = client.UserInformation
         collection = db.UserProfiles
@@ -181,7 +200,7 @@ class Landlord(User):
     
     def get_my_properties(self):
         # Access the database to retrieve my_properties
-        connection_string = "mongodb+srv://21aravindnair:harambe@userpasswords.pxdm1kt.mongodb.net/"
+        connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
         client = MongoClient(connection_string, tlsCaFile=ca) 
         db = client.UserInformation
         collection = db.UserProfiles
@@ -200,7 +219,7 @@ class Landlord(User):
             self.additional_fields["my_properties"].remove(address)
 
         # Update the database with the modified Landlord data
-        connection_string = "mongodb+srv://21aravindnair:harambe@userpasswords.pxdm1kt.mongodb.net/"
+        connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
         client = MongoClient(connection_string, tlsCaFile=ca) 
         db = client.UserInformation
         collection = db.UserProfiles
@@ -212,6 +231,21 @@ class Landlord(User):
 
         client.close()
     
+    # def convert_to_landlord(cls, user_object):
+    #     user_info = user_object.retrieve_user_info(user_object.username)
+    #     if user_info.user_type == 'landlord':
+    #         return cls(
+    #             username=user_info.username,
+    #             password=user_info.password,
+    #             payment_info=user_info.payment_info,
+    #             my_properties=user_info.additional_fields.get("my_properties", [])
+    #         )
+    #     else:
+    #         # Error Handling
+    #         raise UnexpectedLogicException("Somehow entered logic in which user_type is not LANDLORD and called this method")
+
+
+
 class Tenant(User): #Tenant is subclass to User
     def __init__(self, username, password, payment_info, housing_group, saved_properties, upcoming_tours):
         super().__init__(username, password, payment_info, "tenant")
@@ -219,6 +253,7 @@ class Tenant(User): #Tenant is subclass to User
         self.additional_fields["saved_properties"] = saved_properties
         self.additional_fields["upcoming_tours"] = upcoming_tours
 
+    # @classmethod
     def from_dict(self, tenant_dict):
         return self.__class__(
             username=tenant_dict.get('username'),
@@ -229,11 +264,13 @@ class Tenant(User): #Tenant is subclass to User
             upcoming_tours=tenant_dict.get('additional_fields', {}).get('upcoming_tours', [])
         )
     
+    # @classmethod
     def to_dict(self):
         return {key: value for key, value in self.__dict__.items() if not key.startswith("--")}
 
+    # @classmethod
     def insert_tenant_info(self):
-        connection_string = "mongodb+srv://21aravindnair:harambe@userpasswords.pxdm1kt.mongodb.net/"
+        connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
         client = MongoClient(connection_string, tlsCaFile=ca) 
         db = client.UserInformation
         collection = db.UserProfiles
@@ -244,8 +281,9 @@ class Tenant(User): #Tenant is subclass to User
         
         client.close()
 
+    # @classmethod
     def retrieve_tenant_info(self): #access database for all tenant data; use other getters to access information/just access once to get 
-        connection_string = "mongodb+srv://21aravindnair:harambe@userpasswords.pxdm1kt.mongodb.net/"
+        connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
         client = MongoClient(connection_string, tlsCaFile=ca) 
         db = client.UserInformation
         collection = db.UserProfiles
@@ -310,3 +348,18 @@ class Tenant(User): #Tenant is subclass to User
     def clear_all_saved_properties(self): # removes all saved properties from the user profile in the database.
         self.additional_fields["saved_properties"] = []
         self.insert_tenant_info()
+
+    # def convert_to_tenant(self, user_object):
+    #     user_info = user_object.retrieve_user_info(user_object.username)
+    #     if user_info.user_type == 'tenant':
+    #         self.username=user_object.username
+    #         self.password=user_object.password
+    #         self.payment_info=user_object.payment_info
+    #         self.user_type=user_object.user_type
+    #         self.additional_fields["housing_group"] = user_object.additional_fields["housing_group"]
+    #         self.additional_fields["saved_properties"] = user_object.additional_fields["saved_properties"]
+    #         self.additional_fields["upcoming_tours"] = user_object.additional_fields["upcoming_tours"]
+    #     else:
+    #         # Error Handling
+    #         raise UnexpectedLogicException("Somehow entered logic in which user_type is not TENANT and called this method")
+    
