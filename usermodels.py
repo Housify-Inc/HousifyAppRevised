@@ -228,18 +228,6 @@ class Landlord(User):
 
         client.close()
     
-    # def convert_to_landlord(cls, user_object):
-    #     user_info = user_object.retrieve_user_info(user_object.username)
-    #     if user_info.user_type == 'landlord':
-    #         return cls(
-    #             username=user_info.username,
-    #             password=user_info.password,
-    #             payment_info=user_info.payment_info,
-    #             my_properties=user_info.additional_fields.get("my_properties", [])
-    #         )
-    #     else:
-    #         # Error Handling
-    #         raise UnexpectedLogicException("Somehow entered logic in which user_type is not LANDLORD and called this method")
 
 
 
@@ -346,17 +334,4 @@ class Tenant(User): #Tenant is subclass to User
         self.additional_fields["saved_properties"] = []
         self.insert_tenant_info()
 
-    # def convert_to_tenant(self, user_object):
-    #     user_info = user_object.retrieve_user_info(user_object.username)
-    #     if user_info.user_type == 'tenant':
-    #         self.username=user_object.username
-    #         self.password=user_object.password
-    #         self.payment_info=user_object.payment_info
-    #         self.user_type=user_object.user_type
-    #         self.additional_fields["housing_group"] = user_object.additional_fields["housing_group"]
-    #         self.additional_fields["saved_properties"] = user_object.additional_fields["saved_properties"]
-    #         self.additional_fields["upcoming_tours"] = user_object.additional_fields["upcoming_tours"]
-    #     else:
-    #         # Error Handling
-    #         raise UnexpectedLogicException("Somehow entered logic in which user_type is not TENANT and called this method")
-    
+
