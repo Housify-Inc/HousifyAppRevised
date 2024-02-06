@@ -9,16 +9,14 @@
 
 ### Dependencies/Installation/Setup Guidelines:
  1. Retrieve Stripe API Keys (requires SSN, Taxpayer Identification Number) - https://stripe.com/docs/api
- 2. Installing Stripe on Python Command: `pip install Stripe`
- 3. Installing Flask on Python: `pip install Flask`
-
-#### Installing MongoDB(Mango DB):
- 1. 
+ 2. Installing Stripe on Python Command: `pip install stripe`
+ 3. Installing Flask on Python: `pip install flask`
+ 4. Installing MongoDB: `pip install pymongo`
 
 ### Objects Reference:
  1. Tenant Class - Tenant Info
- 2. Landlord Class
- 3. HouseMaster Class
+ 2. Landlord Class - Landlord Info
+ 3. House Class
  4. HouseGroup Sub Class (master: HouseMaster)
  5. HouseDescription Sub Class (master: HouseMaster)
  6. RealEstate Sub Class (master: HouseDescription)
@@ -29,10 +27,20 @@
  1. User Authentication / Retrieve User Info Database
  2. Real Estate Database
 
-### API being used (tentative)
+### Third-Party API being used (tentative):
 
  1. Stripe API
+ 2. MongoDB Database API
+ 3. Twilio Database API (tentative)
 
-###
+### Relevant Stripe API documentation:
 
+ 1. Setting up Test Cards: 
+
+
+ Links: 
+  1. https://stripe.com/docs/test-mode
+  2. https://stripe.com/docs/testing
+  3. https://stripe.com/docs/testing?testing-method=card-numbers
+  
     
