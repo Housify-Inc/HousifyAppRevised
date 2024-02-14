@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import './LoginForm.css';
 import { FaLock } from "react-icons/fa";
-import { Link, useNavigate } from "react-router-dom";
 import { IoIosMail } from "react-icons/io";
+import { Link, useNavigate } from "react-router-dom";
+import './LoginForm.css';
 
 const LoginForm = () => {
     const [email, setEmail] = useState('');
@@ -84,5 +84,6 @@ const LoginForm = () => {
         </div>
     );
 };
+
 
 export default LoginForm;

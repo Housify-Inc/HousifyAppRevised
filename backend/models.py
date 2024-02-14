@@ -6,6 +6,9 @@ ca = certifi.where()
 
 
 class User:
+    """
+    Class for representing a user in the system.
+    """
     def __init__(self, username, password, first_name, last_name, phone_number, payment_info, user_type, additional_fields=None):
         self.username = username
         self.password = password
