@@ -136,7 +136,7 @@ class User:
 
         client.close()
 
-    def validate_username(self):
+    def check_new_user(self):
         connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
         client = MongoClient(connection_string, tlsCaFile=ca) 
         db = client.UserInformation
