@@ -103,7 +103,6 @@ def register_handler():
             # this is used to send the password back to react 
             #   --> it needs to be in a certain format
             user_instance.password = ""
-            print(user_instance.to_dict())
             return jsonify(user_instance.to_dict()), 201
         
         except Exception as e:

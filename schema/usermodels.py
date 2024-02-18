@@ -342,4 +342,3 @@ class Tenant(User): #Tenant is subclass to User
     def clear_all_saved_properties(self):
         self.additional_fields["saved_properties"] = []
         self.insert_tenant_info()
-        
