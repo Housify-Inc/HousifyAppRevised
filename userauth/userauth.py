@@ -2,10 +2,12 @@ from usermodels import User
 from Exceptions import UserNotFoundException
 from flask import Flask, request, jsonify
 import bcrypt
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
-@app.route('/login', methods=['GET'])
+@app.route('/login', methods=['GET', 'OPTIONS'])
 def login_handler():
     """
     This endpoint is used to authenticate a user.
@@ -13,8 +15,15 @@ def login_handler():
     If the credentials are valid, a JSON object containing the user's information will be returned.
     If the credentials are invalid, an error message will be returned.
     """
-
-    if request.method == 'GET':
+    if request.method == 'OPTIONS':
+        # Handle CORS preflight request
+        response = jsonify({'message': 'CORS preflight request handled'})
+        response.headers['Access-Control-Allow-Origin'] = '*'  # Allow requests from any origin
+        response.headers['Access-Control-Allow-Methods'] = 'GET, POST'  # Allow GET and POST methods
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type'  # Allow Content-Type header
+        return response, 200
+    
+    elif request.method == 'GET':
         email = request.args.get('email')
         password = request.args.get('password')
 
@@ -24,24 +33,25 @@ def login_handler():
     
 
         try:
-            # Create an instance of User
+            # retrieve user information from DB
             user_instance = User(username=email, password=password, payment_info="", user_type="", first_name="", last_name="", phone_number="")
-            
-            # Retrieval of user information
-            user_instance.retrieve_user_info(email)
-
+            user_instance = user_instance.retrieve_user_info(email)
+            user_info_dict = user_instance.to_dict()
+ 
             # check whether password matches hashed password stored in DB
-            if not password.encode('utf-8') == user_instance.password.encode('utf-8'):
+            if bcrypt.checkpw(password.encode('utf-8'), user_instance.password):
                 return jsonify({"error": "Incorrect password"}), 400
             
-            return jsonify(user_instance.to_dict()), 200
+            # not sending password back to client for security reasons
+            user_info_dict['password'] = ""
+            return jsonify(user_info_dict), 200
         
         except UserNotFoundException as e:
             return jsonify({"error" : f"{e}"}), 400
-        
+             
     return jsonify({"error" : "Method Not Allowed"}), 405
 
-@app.route('/register', methods=['POST'])
+@app.route('/register', methods=['POST', 'OPTIONS'])
 def register_handler():
     """
     This endpoint is used to register a new user.
@@ -56,7 +66,15 @@ def register_handler():
     A JSON object containing the registered user's information will be returned.
     If there is an error, an error message will be returned.
     """
-    if request.method == 'POST':
+    if request.method == 'OPTIONS':
+        # Handle CORS preflight request
+        response = jsonify({'message': 'CORS preflight request handled'})
+        response.headers['Access-Control-Allow-Origin'] = '*'  # Allow requests from any origin
+        response.headers['Access-Control-Allow-Methods'] = 'GET, POST'  # Allow GET and POST methods
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type'  # Allow Content-Type header
+        return response, 200
+    
+    elif request.method == 'POST':
         try: 
             #extract request body
             data = request.json
@@ -76,12 +94,16 @@ def register_handler():
 
             # Create an instance of User
             user_instance = User(username=email, password=hashed_password, payment_info="", user_type=user_type, phone_number=phone_number, first_name=first_name, last_name=last_name)
+            if not user_instance.check_new_user():
+                return jsonify({"error": "User already exists"}), 400
+            
+            # add user to DB
             user_instance.add_user_info()
 
             # this is used to send the password back to react 
             #   --> it needs to be in a certain format
             user_instance.password = ""
-
+            print(user_instance.to_dict())
             return jsonify(user_instance.to_dict()), 201
         
         except Exception as e:

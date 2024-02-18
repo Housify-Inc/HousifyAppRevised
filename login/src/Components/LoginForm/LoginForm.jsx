@@ -22,7 +22,7 @@ const LoginForm = () => {
 
     
         // Construct the URL with query parameters
-        // @Shivam -- change this link to the website we host this auth service on later
+        // Will need to change this later when server hosted somewhere else
         const loginUrl = `http://localhost:8090/login?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`;
     
         // Make a GET request to your Flask API endpoint with query parameters
@@ -34,11 +34,23 @@ const LoginForm = () => {
         });
     
         const responseData = await response.json();
-    
+        console.log(responseData);
         // Dummy verification
         if (response.ok) {
-            // Redirect to HomePage -- need to change this to dashboard @Shivam
-            navigate('/home');
+            if (responseData.user_type === 'landlord') {
+                // Navigate to Landlord page
+                console.log('landlord');
+                // change this navigation to landlord page
+                navigate('/home');
+            }
+
+            else if(responseData.user_type === 'tenant') {
+                // Navigate to Tenant page
+                console.log('tenant');
+                // change this navigation to tenant page
+                navigate('/home');
+            }
+            
         } else {
             // Handle incorrect credentials (show error message, etc.)
             alert(responseData.error || 'Something went wrong');
