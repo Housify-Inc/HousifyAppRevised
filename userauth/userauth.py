@@ -101,7 +101,7 @@ def register_handler():
             user_instance.add_user_info()
 
             # this is used to send the password back to react 
-            #   --> it needs to be in a certain format
+            #   --> password is not sent back to client for security reasons
             user_instance.password = ""
             return jsonify(user_instance.to_dict()), 201
         
