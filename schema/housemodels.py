@@ -12,33 +12,35 @@ class Details:
 
 
 class RealEstate:
-    def __init__(self, real_estate_address, available, real_estate_owner, real_estate_rent_price, real_estate_images, real_estate_introduction, details):
-        self.real_estate_address = real_estate_address
+    def __init__(self, property_address, property_owner, available, rent_price, images, introduction, details):
+        self.property_address = property_address
+        self.property_owner = property_owner
         self.available = available
-        self.real_estate_owner = real_estate_owner
-        self.real_estate_rent_price = real_estate_rent_price
-        self.real_estate_images = real_estate_images
-        self.real_estate_introduction = real_estate_introduction
+        self.rent_price = rent_price
+        self.images = images
+        self.introduction = introduction
         self.details = details
 
 
 class Group:
-    def __init__(self, property_address, landlord_name, all_housemates):
+    def __init__(self, property_address, property_owner, all_housemates):
         self.property_address = property_address
-        self.landlord_name = landlord_name
+        self.property_owner = property_owner
         self.all_housemates = all_housemates
 
 
 class House:
-    def __init__(self, property_address, group, real_estate):
+    def __init__(self, property_address, property_owner, group, real_estate):
         self.property_address = property_address
+        self.property_owner = property_owner
         self.group = group
         self.real_estate = real_estate
 
     @classmethod
-    def from_dict(self, house_dict):
-        return self.__class__(
+    def from_dict(cls, house_dict):
+        return cls(
             property_address=house_dict.get('property_address'),
+            property_owner=house_dict.get('property_owner'),
             group=Group(**house_dict.get('group')),
             real_estate=RealEstate(**house_dict.get('real_estate'))
         )
@@ -46,18 +48,19 @@ class House:
     def to_dict(self):
         return {
             "property_address": self.property_address,
+            "property_owner": self.property_owner,
             "group": {
                 "property_address": self.group.property_address,
-                "landlord_name": self.group.landlord_name,
+                "property_owner": self.group.property_owner,
                 "all_housemates": self.group.all_housemates
             },
             "real_estate": {
-                "real_estate_address": self.real_estate.real_estate_address,
+                "property_address": self.real_estate.property_address,
+                "property_owner": self.real_estate.property_owner,
                 "available": self.real_estate.available,
-                "real_estate_owner": self.real_estate.real_estate_owner,
-                "real_estate_rent_price": self.real_estate.real_estate_rent_price,
-                "real_estate_images": self.real_estate.real_estate_images,
-                "real_estate_introduction": self.real_estate.real_estate_introduction,
+                "rent_price": self.real_estate.rent_price,
+                "images": self.real_estate.images,
+                "introduction": self.real_estate.introduction,
                 "details": {
                     "bedroom_count": self.real_estate.details.bedroom_count,
                     "bathroom_count": self.real_estate.details.bathroom_count,
