@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faComment, faMoneyBill } from '@fortawesome/free-solid-svg-icons';
 import userData from './people.json';
 import Messenger from './Messenger';
+import Payment from './payment';
 
 const UserTable = () => {
     const [showPaymentForm, setShowPaymentForm] = useState(false);
@@ -57,16 +58,24 @@ const UserTable = () => {
                 </div>
                 {/* Payment Form */}
                 {showPaymentForm && (
-                    <div className="bg-gray-200 p-4 mt-4 float-right">
+                    
+                    <div  className="w-half max-w-98 px-10 bg-white rounded-lg py-4 shadow-lg">
                         <h2 className="text-xl font-bold mb-2">Payment Form</h2>
-                        <form>
+                            <Payment/>
+                        {/* <form>
                             <label htmlFor="paymentAmount">Payment Amount:</label>
                             <input type="text" id="paymentAmount" name="paymentAmount" />
                             <button type="submit" className="mt-2 bg-blue-500 text-white px-4 py-2 rounded-md">Submit Payment</button>
-                        </form>
+                        </form> */}
                     </div>
+                    )
+                }
+                {showMessenger && (
+                    <div  className="w-half max-w-98 px-10 bg-white rounded-lg py-4 shadow-lg">
+                    <Messenger/>
+                    </div>
+                
                 )}
-                {showMessenger && <Messenger/>}
         </div>
     );
 };

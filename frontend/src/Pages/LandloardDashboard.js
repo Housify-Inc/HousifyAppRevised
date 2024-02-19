@@ -128,7 +128,7 @@ export default function LandLoardDashboard() {
                                     href={item.href}
                                     className={classNames(
                                       active ? 'bg-gray-100' : '',
-                                      'block px-4 py-2 text-sm text-gray-700'
+                                      'block px-4 text-sm text-gray-700'
                                     )}
                                   >
                                     {item.name}
@@ -208,17 +208,12 @@ export default function LandLoardDashboard() {
             </>
           )}
         </Disclosure>
-
-        <header className="bg-white shadow">
-          <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-          </div>
-        </header>
-        <main>
-          <div className="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">{
-              /* Your content */
-              getContentComponent()
-            }</div>
+        <main className="-mt-6">
+            <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                {getContentComponent()}
+            </div>
         </main>
+
 
       </div>
     </>

@@ -10,7 +10,7 @@ const Tours = () => {
     <main className = ' container mx-auto px-8 '>
         <header>
           <div className="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
-            <h1 className="text-3xl font-bold tracking-tight text-gray-900">My Tours</h1>
+            <h1 className="text-3xl font-bold tracking-tight text-gray-100">My Tours</h1>
           </div>
         </header>
         <div className = ' grid lg:grid-cols-3 gap-6'>
