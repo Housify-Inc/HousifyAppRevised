@@ -2,10 +2,11 @@ from usermodels import User
 from Exceptions import UserNotFoundException
 from flask import Flask, request, jsonify
 import bcrypt
-
+from flask_cors import CORS
 app = Flask(__name__)
+CORS(app)
 
-@app.route('/login', methods=['GET'])
+@app.route('/login', methods=['GET', 'OPTIONS'])
 def login_handler():
     """
     This endpoint is used to authenticate a user.
@@ -13,8 +14,15 @@ def login_handler():
     If the credentials are valid, a JSON object containing the user's information will be returned.
     If the credentials are invalid, an error message will be returned.
     """
+    if request.method == 'OPTIONS':
+        # Handle CORS preflight request
+        response = jsonify({'message': 'CORS preflight request handled'})
+        response.headers['Access-Control-Allow-Origin'] = '*'  # Allow requests from any origin
+        response.headers['Access-Control-Allow-Methods'] = 'GET, POST'  # Allow GET and POST methods
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type'  # Allow Content-Type header
+        return response, 200
 
-    if request.method == 'GET':
+    elif request.method == 'GET':
         email = request.args.get('email')
         password = request.args.get('password')
 
