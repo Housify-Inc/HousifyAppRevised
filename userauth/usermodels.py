@@ -115,7 +115,6 @@ class User:
         print(f"User Type: {self.user_type}")
         print(f"Additional Fields: {self.additional_fields}")
     
-    #FLAG FLAG FLAG FLAG FLAG FLAG FLAG FLAG FLAG FLAG FLAG FLAG FLAG FLAG
     def add_user_info(self): #inserts user info into database
         connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
         client = MongoClient(connection_string, tlsCaFile=ca) 
@@ -137,7 +136,7 @@ class User:
 
         client.close()
 
-    def validate_username(self):
+    def check_new_user(self):
         connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
         client = MongoClient(connection_string, tlsCaFile=ca) 
         db = client.UserInformation
@@ -233,19 +232,6 @@ class Landlord(User):
         collection.update_one(filter_query, update_query)
 
         client.close()
-    
-    # def convert_to_landlord(cls, user_object):
-    #     user_info = user_object.retrieve_user_info(user_object.username)
-    #     if user_info.user_type == 'landlord':
-    #         return cls(
-    #             username=user_info.username,
-    #             password=user_info.password,
-    #             payment_info=user_info.payment_info,
-    #             my_properties=user_info.additional_fields.get("my_properties", [])
-    #         )
-    #     else:
-    #         # Error Handling
-    #         raise UnexpectedLogicException("Somehow entered logic in which user_type is not LANDLORD and called this method")
 
 
 
@@ -316,53 +302,43 @@ class Tenant(User): #Tenant is subclass to User
         else:
             return self.retrieve_tenant_info(username).additional_fields["upcoming_tours"]
   
-    def add_housing_group(self, housing_group): # insert database for housing group
-        self.additional_fields["housing_group"] = housing_group
-        self.insert_tenant_info()
+    def add_housing_group(self, housing_group):
+        if not self.get_housing_group():
+            self.additional_fields["housing_group"] = housing_group
+            self.insert_tenant_info()
 
-    def remove_housing_group(self): # clears housing group from the object's database.
+    def remove_housing_group(self):
         self.additional_fields["housing_group"] = None
         self.insert_tenant_info()
 
-    def insert_new_saved_property(self, saved_property): # inserting new saved property into the database.
-        saved_properties = self.additional_fields["saved_properties"]
+    def insert_new_saved_property(self, saved_property):
+        tenant_info = self.retrieve_tenant_info()
+        saved_properties = tenant_info.additional_fields["saved_properties"]
         saved_properties.append(saved_property)
         self.insert_tenant_info()
 
-    def remove_new_saved_property(self, saved_property): # removing new saved property from the database.
-        saved_properties = self.additional_fields["saved_properties"]
+    def remove_new_saved_property(self, saved_property):
+        tenant_info = self.retrieve_tenant_info()
+        saved_properties = tenant_info.additional_fields["saved_properties"]
         saved_properties.remove(saved_property)
         self.insert_tenant_info()
 
-    def add_upcoming_tour(self, tour): # insert into the database for upcoming tour
-        upcoming_tours = self.additional_fields["upcoming_tours"]
+    def add_upcoming_tour(self, tour):
+        tenant_info = self.retrieve_tenant_info()
+        upcoming_tours = tenant_info.additional_fields["upcoming_tours"]
         upcoming_tours.append(tour)
         self.insert_tenant_info()
 
-    def remove_upcoming_tour(self, tour): # removes tour from the object.
-        upcoming_tours = self.additional_fields["upcoming_tours"]
+    def remove_upcoming_tour(self, tour):
+        tenant_info = self.retrieve_tenant_info()
+        upcoming_tours = tenant_info.additional_fields["upcoming_tours"]
         upcoming_tours.remove(tour)
         self.insert_tenant_info()
 
-    def clear_all_upcoming_tours(self): # removes all tours from the user profile in the database.
+    def clear_all_upcoming_tours(self):
         self.additional_fields["upcoming_tours"] = []
         self.insert_tenant_info()
 
-    def clear_all_saved_properties(self): # removes all saved properties from the user profile in the database.
+    def clear_all_saved_properties(self):
         self.additional_fields["saved_properties"] = []
         self.insert_tenant_info()
-
-    # def convert_to_tenant(self, user_object):
-    #     user_info = user_object.retrieve_user_info(user_object.username)
-    #     if user_info.user_type == 'tenant':
-    #         self.username=user_object.username
-    #         self.password=user_object.password
-    #         self.payment_info=user_object.payment_info
-    #         self.user_type=user_object.user_type
-    #         self.additional_fields["housing_group"] = user_object.additional_fields["housing_group"]
-    #         self.additional_fields["saved_properties"] = user_object.additional_fields["saved_properties"]
-    #         self.additional_fields["upcoming_tours"] = user_object.additional_fields["upcoming_tours"]
-    #     else:
-    #         # Error Handling
-    #         raise UnexpectedLogicException("Somehow entered logic in which user_type is not TENANT and called this method")
-    

@@ -62,10 +62,23 @@ const RegisterForm = () => {
                 },
                 body: JSON.stringify(userData),
             });
-
+    
             // Check if registration was successful
-            if (response.status === 201) {
-                navigate('/home');
+            if (response.ok) {
+                const responseData = await response.json();
+                console.log(responseData);
+    
+                if (responseData.user_type === 'landlord') {
+                    // Navigate to Landlord page
+                    console.log('landlord');
+                    // change this navigation to landlord page
+                    navigate('/home');
+                } else if (responseData.user_type === 'tenant') {
+                    // Navigate to Tenant page
+                    console.log('tenant');
+                    // change this navigation to tenant page
+                    navigate('/home');
+                }
             } else {
                 // Handle registration error
                 const data = await response.json();
