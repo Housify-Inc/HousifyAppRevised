@@ -22,12 +22,14 @@ function App() {
         <Route path="/" element={<LoginForm />} />
         <Route path="/register" element={<RegisterForm />} />
         <Route path="/forgot-password" element={<ForgotPasswordForm />} />
-        {userType === 'Tenant' && (
+        <Route path="/tenant-home" element ={<TenantDashboard/>} />
+        <Route path="/landlord-home" element ={<LandloardDashboard/>} />
+        {/* {userType === 'Tenant' && (
           <Route path="/home" element={<TenantDashboard />} />
         )}
         {userType === 'LandLord' && (
           <Route path="/home" element={<LandloardDashboard />} />
-        )}
+        )} */}
       </Routes>
     </Router>
   );
