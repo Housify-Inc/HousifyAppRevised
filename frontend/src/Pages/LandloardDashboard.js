@@ -20,7 +20,7 @@ const initialNavigation = [
 const userNavigation = [
   { name: 'Your Profile', href: '#' },
   { name: 'Settings', href: '#' },
-  { name: 'Sign out', href: '#' },
+  { name: 'Sign out', href: '/'},
 ]
 
 function classNames(...classes) {
@@ -28,8 +28,8 @@ function classNames(...classes) {
 }
 
 export default function LandLoardDashboard() {
-  const [navigation, setNavigation] = useState(initialNavigation);
 
+  const [navigation, setNavigation] = useState(initialNavigation);
   const handleNavigationClick = (clickedIndex) => {
     const updatedNavigation = navigation.map((item, index) => ({
       ...item,

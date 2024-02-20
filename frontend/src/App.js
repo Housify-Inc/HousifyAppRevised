@@ -24,6 +24,7 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPasswordForm />} />
         <Route path="/tenant-home" element ={<TenantDashboard/>} />
         <Route path="/landlord-home" element ={<LandloardDashboard/>} />
+        <Route path="" element={<LoginForm />} />
         {/* {userType === 'Tenant' && (
           <Route path="/home" element={<TenantDashboard />} />
         )}
