@@ -72,12 +72,12 @@ const RegisterForm = () => {
                     // Navigate to Landlord page
                     console.log('landlord');
                     // change this navigation to landlord page
-                    navigate('/home');
+                    navigate('/landlord-home');
                 } else if (responseData.user_type === 'tenant') {
                     // Navigate to Tenant page
                     console.log('tenant');
                     // change this navigation to tenant page
-                    navigate('/home');
+                    navigate('/tenant-home');
                 }
             } else {
                 // Handle registration error

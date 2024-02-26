@@ -8,3 +8,6 @@ class UnexpectedLogicException(Exception):
 
 class RestrictedActionException(Exception):
     pass
+
+class HouseNotFoundException(Exception):
+    pass

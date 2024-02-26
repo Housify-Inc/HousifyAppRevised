@@ -1,20 +1,44 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faComment, faMoneyBill } from '@fortawesome/free-solid-svg-icons';
-import userData from './people.json';
+//import userData from './people.json';
 import Messenger from './Messenger';
 import Payment from './payment';
+import { getResponseData } from '../ResponseHandler';
 
 const UserTable = () => {
+    const responseData = getResponseData();
+    console.log(responseData.additional_fields.housing_group);
     const [showPaymentForm, setShowPaymentForm] = useState(false);
     const [showMessenger, setShowMessenger] = useState(false);
+    const [users, setUsers] = useState([]);
 
+    useEffect( () =>{
+        const handleGroup = async () =>{
+            // e.preventDefault();
+            const groupUrl = `http://localhost:8090/tenant-home?housing_group=${encodeURIComponent(responseData.additional_fields.housing_group)}`;
+            
+            const response = await fetch(groupUrl, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            const groupData = await response.json();
+            setUsers(groupData);
+            //console.log(groupData);
+        };
+
+        handleGroup();
+    }, []); 
     const handleMessageClick = () => {
         setShowMessenger(!showMessenger);
     };
     const handlePaymentButtonClick = () => {
         setShowPaymentForm(!showPaymentForm);
     };
+
+
 
     return (
         <div className="container mx-auto px-2 py-8 flex">
@@ -25,14 +49,15 @@ const UserTable = () => {
                 </div>
                 </div>
                 <ul role="list" className="ml-0">
-                    {userData.map((user, index) => (
+                    {users.map((user, index) => (
                         <li key={index} className={`flex justify-between gap-x-6 py-5 pl-4 pr-4`}>
                             <div className="flex min-w-0 gap-x-4">
                                 {/* Profile Image */}
-                                <img className="h-12 w-12 flex-none rounded-full bg-gray-50" src={user.imageUrl} alt="" />
+                                {/* <img className="h-12 w-12 flex-none rounded-full bg-gray-50" src={user.imageUrl} alt="" /> */}
                                 <div className="min-w-0 flex-auto">
-                                    <p className="text-sm font-semibold leading-6 text-gray-900">{user.name}</p>
-                                    <p className="mt-1 truncate text-xs leading-5 text-gray-500">{user.email}</p>
+                                    {/* <p className="text-sm font-semibold leading-6 text-gray-900">{user.name}</p> */}
+                                    <p className="mt-1 truncate text-xs leading-5 text-gray-500">{user.first_name + " " + user.last_name}</p>
+                                    <p className="mt-1 truncate text-xs leading-5 text-gray-500">{user.phone_number}</p>
                                 </div>
                             </div>
                             <div className="flex gap-x-2">

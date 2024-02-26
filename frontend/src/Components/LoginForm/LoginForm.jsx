@@ -3,6 +3,7 @@ import { FaLock } from "react-icons/fa";
 import { IoIosMail } from "react-icons/io";
 import { Link, useNavigate } from "react-router-dom";
 import './LoginForm.css';
+import { setResponseData } from "../../ResponseHandler";
 
 const LoginForm = () => {
     const [email, setEmail] = useState('');
@@ -34,6 +35,8 @@ const LoginForm = () => {
         });
     
         const responseData = await response.json();
+        setResponseData(responseData);
+
         console.log(responseData);
         // Dummy verification
         if (response.ok) {
@@ -48,7 +51,7 @@ const LoginForm = () => {
                 // Navigate to Tenant page
                 console.log('tenant');
                 // change this navigation to tenant page
-                navigate('tenant-home');
+                navigate('/tenant-home');
             }
             
         } else {

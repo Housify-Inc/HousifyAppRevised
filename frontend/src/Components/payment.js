@@ -13,7 +13,44 @@
   ```
 */
 import React from 'react';
+import { useState} from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {faMoneyBill } from '@fortawesome/free-solid-svg-icons';
 const Payment = () => {
+  const [stripenumber, setStripeNum] = useState('');
+
+  const handleStripeChange = (e) => {
+    setStripeNum(e.target.value);
+};
+  const getPaymentInfo = async (e) => {
+
+  }
+  const handle_payment = async (e) => {
+    e.preventDefault();
+
+
+    // Construct the URL with query parameters
+    // Will need to change this later when server hosted somewhere else
+    const loginUrl = `http://localhost:8090/tenant-home`;
+
+    // Make a GET request to your Flask API endpoint with query parameters
+    const response = await fetch(loginUrl, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+    const responseData = await response.json();
+    console.log(responseData);
+    // Dummy verification
+    if (response.ok) {
+      setStripeNum(responseData.username);
+      console.log(stripenumber);  
+    } else {
+        // Handle incorrect credentials (show error message, etc.)
+        alert(responseData.error || 'Something went wrong');
+    }
+  };
     return (
       <div className='mt-6'>
         <label htmlFor="price" className="block text-sm font-medium leading-6 text-gray-900">
@@ -45,6 +82,11 @@ const Payment = () => {
             </select>
           </div>
         </div>
+        <button className="flex items-center justify-center px-6 py-1 bg-green-500 text-white rounded-md"
+            onClick={handle_payment}>
+        <FontAwesomeIcon icon={faMoneyBill} className="mr-1" />
+          Pay
+        </button>
       </div>
     )
   }
