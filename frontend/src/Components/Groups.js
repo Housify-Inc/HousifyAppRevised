@@ -5,6 +5,7 @@ import { faComment, faMoneyBill } from '@fortawesome/free-solid-svg-icons';
 import Messenger from './Messenger';
 import Payment from './payment';
 import { getResponseData } from '../ResponseHandler';
+import { setUserData } from './UserHandler';
 
 const UserTable = () => {
     const responseData = getResponseData();
@@ -12,6 +13,7 @@ const UserTable = () => {
     const [showPaymentForm, setShowPaymentForm] = useState(false);
     const [showMessenger, setShowMessenger] = useState(false);
     const [users, setUsers] = useState([]);
+    const [selectedUser, setSelectedUser] = useState(null);
 
     useEffect( () =>{
         const handleGroup = async () =>{
@@ -26,13 +28,15 @@ const UserTable = () => {
             });
             const groupData = await response.json();
             setUsers(groupData);
-            //console.log(groupData);
+            
+            console.log(groupData);
         };
 
         handleGroup();
     }, []); 
-    const handleMessageClick = () => {
+    const handleMessageClick = (user) => {
         setShowMessenger(!showMessenger);
+        setSelectedUser(user)
     };
     const handlePaymentButtonClick = () => {
         setShowPaymentForm(!showPaymentForm);
@@ -64,7 +68,7 @@ const UserTable = () => {
                                 {/* Action Buttons */}
                                 <button
                                     className="flex items-center justify-center px-2 py-1 bg-blue-500 text-white rounded-md mr-2"
-                                    onClick={handleMessageClick} // Example action
+                                    onClick={() => handleMessageClick(user)} // Example action
                                 >
                                     <FontAwesomeIcon icon={faComment} className="mr-1" />
                                     Message
@@ -97,9 +101,8 @@ const UserTable = () => {
                 }
                 {showMessenger && (
                     <div  className="w-half max-w-98 px-10 bg-white rounded-lg py-4 shadow-lg">
-                    <Messenger/>
+                    <Messenger initialRoom={`${selectedUser.first_name} ${selectedUser.last_name}`}/>
                     </div>
-                
                 )}
         </div>
     );
