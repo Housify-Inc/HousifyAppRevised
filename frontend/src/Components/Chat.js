@@ -1,7 +1,7 @@
-import React, { useState, useRef, useEffect } from "react"
-import { addDoc, serverTimestamp, collection, onSnapshot, query, where, orderBy } from 'firebase/firestore';
+import { addDoc, collection, onSnapshot, orderBy, query, serverTimestamp, where } from 'firebase/firestore';
+import React, { useEffect, useRef, useState } from "react";
+import { getResponseData } from "../ResponseHandler";
 import { auth, db } from '../firebase-config';
-import { getResponseData } from "./ResponseHandler";
 
 
 export const Chat = (props) => {

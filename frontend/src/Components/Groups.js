@@ -5,7 +5,6 @@ import { faComment, faMoneyBill } from '@fortawesome/free-solid-svg-icons';
 import Messenger from './Messenger';
 import Payment from './payment';
 import { getResponseData } from '../ResponseHandler';
-import { setUserData } from './UserHandler';
 
 const UserTable = () => {
     const responseData = getResponseData();
