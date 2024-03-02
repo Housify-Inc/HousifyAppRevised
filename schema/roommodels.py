@@ -24,11 +24,10 @@ class Rooms:
     def to_dict(self):
         return {
                 "room_users" : self.room_users,
-                "messages" : {
-                    "text" : self.messages.text,
-                    "timestamp" : self.messages.timestamp,
-                    "sender" : self.messages.sender,
-                }
+                "messages": [
+                {"text": msg.text, "timestamp": msg.timestamp, "sender": msg.sender}
+                for msg in self.messages
+                ],
             }
 
 
