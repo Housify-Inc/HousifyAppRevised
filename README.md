@@ -20,7 +20,7 @@
 
 1.  Tenant Class - Tenant Info
 2.  Landlord Class - Landlord Info
-3.  House Class
+3.  House Class - House Info
 4.  HouseGroup Sub Class (master: HouseMaster)
 5.  HouseDescription Sub Class (master: HouseMaster)
 6.  RealEstate Sub Class (master: HouseDescription)
