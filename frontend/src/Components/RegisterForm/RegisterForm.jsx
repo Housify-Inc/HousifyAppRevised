@@ -1,10 +1,8 @@
-import React, { useState } from "react";
-import './RegisterForm.css';
-import { FaUser } from "react-icons/fa";
-import { FaLock } from "react-icons/fa";
-import { FaPhone } from "react-icons/fa";
+import React, { useState, version } from "react";
+import { FaLock, FaPhone, FaUser } from "react-icons/fa";
 import { IoIosMail } from "react-icons/io";
 import { Link, useNavigate } from "react-router-dom";
+import './RegisterForm.css';
 
 const RegisterForm = () => {
     const [firstName, setFirstName] = useState('');
@@ -13,6 +11,7 @@ const RegisterForm = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [userType, setUserType] = useState('');
+    const [venmoURL, setVenmoUrl] = useState('');
     const navigate = useNavigate();
 
 
@@ -40,6 +39,10 @@ const RegisterForm = () => {
         setUserType(e.target.value);
     };
 
+    const handleVenmoUrlChange = (e) => {
+        setVenmoUrl(e.target.value);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -51,6 +54,7 @@ const RegisterForm = () => {
             email,
             password,
             userType,
+            venmoURL,
         };
 
         try {
@@ -147,6 +151,16 @@ const RegisterForm = () => {
                         placeholder="Password" 
                         value={password}
                         onChange={handlePasswordChange}
+                        required></input>
+                    <FaLock className="icon"/>
+                </div>
+
+                <div className="input-box">
+                    <input 
+                        type="url" 
+                        placeholder="Venmo URL" 
+                        value={venmoURL}
+                        onChange={handleVenmoUrlChange}
                         required></input>
                     <FaLock className="icon"/>
                 </div>
