@@ -31,7 +31,7 @@ class Rooms:
             }
 
 
-    def insert_room_info(self):
+    def create_room(self):
         self.client = MongoClient("mongodb+srv://housify-customer-account-test1:housify-customer-test1@directmessages.xzfffoj.mongodb.net/")
         self.db = self.client.DM
         self.collection = self.db.DirectMessages
@@ -62,6 +62,18 @@ class Rooms:
             raise RoomNotFoundException(f"No Room found with id: {id}")
         
         return room.get('room_users', [])
+    
+    def retrieve_room_messages(self, id = None):
+        self.client = MongoClient("mongodb+srv://housify-customer-account-test1:housify-customer-test1@directmessages.xzfffoj.mongodb.net/")
+        self.db = self.client.DM
+        self.collection = self.db.DirectMessages
+
+        room = self.collection.find_one({"_id": id})
+
+        if not room:
+            raise RoomNotFoundException(f"No Room found with id: {id}")
+        
+        return room.get('messages', [])
 
 
     def print_room_info(self):
