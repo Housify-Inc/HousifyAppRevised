@@ -88,6 +88,16 @@ class Rooms:
             raise RoomNotFoundException(f"No Room found with id: {id}")
 
         return room.get("messages", [])
+    
+    def retrieve_all_rooms(self):
+        self.client = MongoClient("mongodb+srv://housify-customer-account-test1:housify-customer-test1@directmessages.xzfffoj.mongodb.net/", tlsCaFile=ca)
+        self.db = self.client.DM
+        self.collection = self.db.DirectMessages
+        cursor = self.collection.find({})
+        roomArray = []
+        for room in cursor:
+            roomArray.append(room)
+        return roomArray
 
     def print_room_info(self):
         print("Room Information")
