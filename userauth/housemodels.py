@@ -65,11 +65,11 @@ class House:
                 "images": self.real_estate.images,
                 "introduction": self.real_estate.introduction,
                 "details": {
-                    "bedroom_count": self.real_estate.details["bedroom_count"],
-                    "bathroom_count": self.real_estate.details["bathroom_count"],
-                    # "appliances": self.real_estate.details.appliances,
-                    # "laundry": self.real_estate.details.laundry,
-                    # "pet_friendly": self.real_estate.details.pet_friendly
+                    "bedroom_count": self.real_estate.details.bedroom_count,
+                    "bathroom_count": self.real_estate.details.bathroom_count,
+                    "appliances": self.real_estate.details.appliances,
+                    "laundry": self.real_estate.details.laundry,
+                    "pet_friendly": self.real_estate.details.pet_friendly
                 }
             }
         }
@@ -87,6 +87,17 @@ class House:
         client.close()
 
         return self.from_dict(house)
+
+    def add_house_info(self): #inserts user info into database
+        connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@houseinfo.5nbfw82.mongodb.net/"
+        client = MongoClient(connection_string, tlsCaFile=ca) 
+        db = client.HousesDatabase
+        collection = db.HouseInfo
+        print('got here')
+        house_data = self.to_dict()
+        collection.insert_one(house_data)
+
+        client.close()
 
     def print_housing_info(self):
         print(f"Groups: {self.group.all_housemates}")

@@ -1,5 +1,5 @@
 from usermodels import User, Tenant
-from housemodels import House
+from housemodels import House, RealEstate, Group, Details
 from Exceptions import UserNotFoundException, HouseNotFoundException
 from flask import Flask, request, jsonify
 import bcrypt
@@ -162,11 +162,11 @@ def tenant_handler():
     elif request.method == "GET":
         group = request.args.get("housing_group")
         try:
+
             house_instance = House(
                 property_address=group, property_owner="", group="", real_estate=""
             )
             house_instance = house_instance.retrieve_housing_info(group)
-            house_info_dict = house_instance.to_dict()
 
             all_housemates_array = []
             for i in house_instance.group.all_housemates:
@@ -189,6 +189,78 @@ def tenant_handler():
 
         except HouseNotFoundException as e:
             return jsonify({"errortest": f"{e}"}), 400
+
+@app.route("/landlord-home", methods=["GET", "POST", "OPTIONS"])
+def landlord_handler():
+    if request.method == "OPTIONS":
+        # Handle CORS preflight request
+        response = jsonify({"message": "CORS preflight request handled"})
+        response.headers["Access-Control-Allow-Origin"] = (
+            "*"  # Allow requests from any origin
+        )
+        response.headers["Access-Control-Allow-Methods"] = (
+            "GET, POST"  # Allow GET and POST methods
+        )
+        response.headers["Access-Control-Allow-Headers"] = (
+            "Content-Type"  # Allow Content-Type header
+        )
+        return response, 200
+
+    elif request.method == "POST":
+        try:
+            # extract request body
+            data = request.json
+            address = data.get("property_address")
+            intoduction = data.get("introduction")
+            owner = data.get("property_owner")
+            bedroom_count = data.get("bedroom_count")
+            bathroom_count = data.get("bathroom_count")
+            rent_price = data.get("rent_prices")
+            laundry = data.get("laundry")
+            pet_friendly = data.get("pet_friendly")
+            images = data.get("images")
+            available = data.get("available")
+
+            detail_instance = Details(
+                bedroom_count=bedroom_count, 
+                bathroom_count=bathroom_count,
+                appliances=[],
+                laundry=laundry,
+                pet_friendly=pet_friendly
+            )
+
+            realestate_instance = RealEstate(
+                property_address=address,
+                property_owner=owner,
+                available=available,
+                rent_price=rent_price,
+                images=images,
+                introduction=intoduction,
+                details=detail_instance
+            )
+            group_instance = Group(
+                property_address=address, 
+                property_owner=owner,
+                all_housemates=[]
+            )
+
+            house_instance = House(
+                property_address=address,
+                property_owner=owner, 
+                group=group_instance, 
+                real_estate=realestate_instance)
+            print("Made House Object")
+            house_instance.print_housing_info()
+            
+            # add user to DB
+            house_instance.add_house_info()
+            print("Added House Object")
+            return jsonify(house_instance.to_dict()), 201
+
+        except Exception as e:
+            return jsonify({"error": str(e)}), 400
+
+    return jsonify({"error": "Method Not Allowed"}), 405
 
 
 if __name__ == "__main__":
