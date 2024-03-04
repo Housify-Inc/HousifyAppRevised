@@ -8,7 +8,7 @@ import { getResponseData } from '../ResponseHandler';
 
 const UserTable = () => {
     const responseData = getResponseData();
-    console.log(responseData.additional_fields.housing_group);
+    console.log(responseData.housing_group);
     const [showPaymentForm, setShowPaymentForm] = useState(false);
     const [showMessenger, setShowMessenger] = useState(false);
     const [users, setUsers] = useState([]);
@@ -17,7 +17,7 @@ const UserTable = () => {
     useEffect( () =>{
         const handleGroup = async () =>{
             // e.preventDefault();
-            const groupUrl = `http://localhost:8090/tenant-home?housing_group=${encodeURIComponent(responseData.additional_fields.housing_group)}`;
+            const groupUrl = `http://localhost:8090/tenant-home?housing_group=${encodeURIComponent(responseData.housing_group)}`;
             
             const response = await fetch(groupUrl, {
                 method: 'GET',
