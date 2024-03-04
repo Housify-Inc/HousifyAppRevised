@@ -8,7 +8,7 @@ import { getResponseData } from '../ResponseHandler';
 
 const UserTable = () => {
     const responseData = getResponseData();
-    console.log(responseData.additional_fields.housing_group);
+    console.log(responseData.housing_group);
     const [showPaymentForm, setShowPaymentForm] = useState(false);
     const [showMessenger, setShowMessenger] = useState(false);
     const [users, setUsers] = useState([]);
@@ -17,7 +17,7 @@ const UserTable = () => {
     useEffect( () =>{
         const handleGroup = async () =>{
             // e.preventDefault();
-            const groupUrl = `http://localhost:8090/tenant-home?housing_group=${encodeURIComponent(responseData.additional_fields.housing_group)}`;
+            const groupUrl = `http://localhost:8090/tenant-home?housing_group=${encodeURIComponent(responseData.housing_group)}`;
             
             const response = await fetch(groupUrl, {
                 method: 'GET',
@@ -36,6 +36,7 @@ const UserTable = () => {
     const handleMessageClick = (user) => {
         setShowMessenger(!showMessenger);
         setSelectedUser(user)
+        console.log(user);
     };
     const handlePaymentButtonClick = () => {
         setShowPaymentForm(!showPaymentForm);
@@ -100,7 +101,7 @@ const UserTable = () => {
                 }
                 {showMessenger && (
                     <div  className="w-half max-w-98 px-10 bg-white rounded-lg py-4 shadow-lg">
-                    <Messenger initialRoom={`${selectedUser.first_name} ${selectedUser.last_name}`}/>
+                    <Messenger receiver_email_input={`${selectedUser.username}`}/>
                     </div>
                 )}
         </div>
