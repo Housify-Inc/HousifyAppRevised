@@ -9,7 +9,7 @@ class User:
     """
     Class for representing a user in the system.
     """
-    def __init__(self, username, password, first_name, last_name, phone_number, payment_info, user_type, additional_fields=None):
+    def __init__(self, username, password, first_name, last_name, phone_number, payment_info, user_type, pending_requests, housing_group, saved_properties, upcoming_tours, my_properties):
         self.username = username
         self.password = password
         self.first_name = first_name
@@ -17,7 +17,13 @@ class User:
         self.phone_number = phone_number
         self.payment_info = payment_info
         self.user_type = user_type
-        self.additional_fields = additional_fields or {}
+        self.upcoming_tours = upcoming_tours # Both landlords and tenants can have this, so this is uniform across both data.
+        #TENANT RELATED DATA
+        self.pending_requests = pending_requests #stores requestID's sent over by House Clients
+        self.housing_group = housing_group
+        self.saved_properties = saved_properties
+        #LANDLORD RELATED DATA
+        self.my_properties = my_properties
 
 
     # @classmethod
@@ -30,12 +36,42 @@ class User:
             last_name=user_dict.get('last_name'),
             phone_number=user_dict.get('phone_number'),
             user_type=user_dict.get('user_type'),
-            additional_fields=user_dict.get('additional_fields')
+            pending_requests=user_dict.get('pending_requests', []),
+            housing_group=user_dict.get('housing_group'),
+            saved_properties=user_dict.get('saved_properties', []),
+            upcoming_tours=user_dict.get('upcoming_tours', []),
+            my_properties=user_dict.get('my_properties', [])
         )
-    
-    # @classmethod
+
     def to_dict(self):
-        return {key: value for key, value in self.__dict__.items() if not key.startswith("--")}
+        # Convert all attributes to a dictionary
+        user_dict = {
+            "username": self.username,
+            "password": self.password,
+            "payment_info": self.payment_info,
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "phone_number": self.phone_number,
+            "user_type": self.user_type,
+            "pending_requests": self.pending_requests,
+            "housing_group": self.housing_group,
+            "saved_properties": self.saved_properties,
+            "upcoming_tours": self.upcoming_tours,
+            "my_properties": self.my_properties,
+        }
+        return user_dict
+    
+    def print_user_info(self):
+        print("User Information:")
+        print(f"Username: {self.username}")
+        print(f"Password: {self.password}")
+        print(f"Payment Info: {self.payment_info}")
+        print(f"User Type: {self.user_type}")
+        print(f"Pending Requests: {self.pending_requests}")
+        print(f"Housing Group: {self.housing_group}")
+        print(f"Saved Properties: {self.saved_properties}")
+        print(f"Upcoming Tours: {self.upcoming_tours}")
+        print(f"My Properties: {self.my_properties}")
     
     # @classmethod
     def retrieve_user_info(self, username): #access database for complete user info
@@ -105,15 +141,6 @@ class User:
             collection.update_one({"username": username}, {"$set": {"payment_info": new_payment_info}})
         
         client.close()
-        
-    # @classmethod
-    def print_user_info(self):
-        print("User Information:")
-        print(f"Username: {self.username}")
-        print(f"Password: {self.password}")
-        print(f"Payment Info: {self.payment_info}")
-        print(f"User Type: {self.user_type}")
-        print(f"Additional Fields: {self.additional_fields}")
     
     def add_user_info(self): #inserts user info into database
         connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
@@ -126,7 +153,7 @@ class User:
 
         client.close()
             
-    def delete_user(self):
+    def delete_user(self): #use for when deleting a user from Housify's Services 
         connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
         client = MongoClient(connection_string, tlsCaFile=ca) 
         db = client.UserInformation
@@ -149,196 +176,3 @@ class User:
         # Return True if the username doesn't exist, False otherwise
         return valid_user is None
     
-
-
-
-
-
-class Landlord(User):
-    def __init__(self, username, password, payment_info, my_properties):
-        super().__init__(username, password, payment_info, "landlord")
-        self.additional_fields["my_properties"] = my_properties
-
-    # @classmethod
-    def from_dict(self, landlord_dict):
-        return self.__class__(
-            username=landlord_dict.get('username'),
-            password=landlord_dict.get('password'),
-            payment_info=landlord_dict.get('payment_info'),
-            my_properties=landlord_dict.get('additional_fields', {}).get('my_properties', [])
-        )
-    
-    # @classmethod
-    def to_dict(self):
-        return {key: value for key, value in self.__dict__.items() if not key.startswith("--")}
-
-    # @classmethod
-    def insert_landlord_info(self):
-        connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
-        client = MongoClient(connection_string, tlsCaFile=ca) 
-        db = client.UserInformation
-        collection = db.UserProfiles
-
-        # Convert Landlord object to dictionary and insert into the database
-        landlord_data = self.to_dict()
-        collection.insert_one(landlord_data)
-        
-        client.close()
-
-    # @classmethod
-    def retrieve_landlord_info(self, username=None): #access database for all tenant data; use other getters to access information/just access once to get 
-        connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
-        client = MongoClient(connection_string, tlsCaFile=ca) 
-        db = client.UserInformation
-        collection = db.UserProfiles
-
-        user = collection.find_one({"username": username})
-        if not user:
-            raise UserNotFoundException(f"No landlord user found with the username: {username}")
-        
-        client.close()
-
-        return self.from_dict(user)
-    
-    def get_my_properties(self):
-        # Access the database to retrieve my_properties
-        connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
-        client = MongoClient(connection_string, tlsCaFile=ca) 
-        db = client.UserInformation
-        collection = db.UserProfiles
-
-        # Find the document in the database
-        landlord_data = collection.find_one({"username": self.username})
-
-        client.close()
-
-        # Return my_properties if available, or an empty list
-        return landlord_data.get('additional_fields', {}).get('my_properties', [])
-    
-    def remove_my_property(self, address):
-        # Remove the specified address from my_properties
-        if address in self.additional_fields["my_properties"]:
-            self.additional_fields["my_properties"].remove(address)
-
-        # Update the database with the modified Landlord data
-        connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
-        client = MongoClient(connection_string, tlsCaFile=ca) 
-        db = client.UserInformation
-        collection = db.UserProfiles
-
-        # Update the document in the database
-        filter_query = {"username": self.username}
-        update_query = {"$set": {"additional_fields.my_properties": self.additional_fields["my_properties"]}}
-        collection.update_one(filter_query, update_query)
-
-        client.close()
-
-
-
-class Tenant(User): #Tenant is subclass to User
-    def __init__(self, username, password, payment_info, housing_group, saved_properties, upcoming_tours):
-        super().__init__(username, password, payment_info, "tenant")
-        self.additional_fields["housing_group"] = housing_group
-        self.additional_fields["saved_properties"] = saved_properties
-        self.additional_fields["upcoming_tours"] = upcoming_tours
-
-    # @classmethod
-    def from_dict(self, tenant_dict):
-        return self.__class__(
-            username=tenant_dict.get('username'),
-            password=tenant_dict.get('password'),
-            payment_info=tenant_dict.get('payment_info'),
-            housing_group=tenant_dict.get('additional_fields', {}).get('housing_group', ''),
-            saved_properties=tenant_dict.get('additional_fields', {}).get('saved_properties', []),
-            upcoming_tours=tenant_dict.get('additional_fields', {}).get('upcoming_tours', [])
-        )
-    
-    # @classmethod
-    def to_dict(self):
-        return {key: value for key, value in self.__dict__.items() if not key.startswith("--")}
-
-    # @classmethod
-    def insert_tenant_info(self):
-        connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
-        client = MongoClient(connection_string, tlsCaFile=ca) 
-        db = client.UserInformation
-        collection = db.UserProfiles
-
-        # Convert Landlord object to dictionary and insert into the database
-        landlord_data = self.to_dict()
-        collection.insert_one(landlord_data)
-        
-        client.close()
-
-    # @classmethod
-    def retrieve_tenant_info(self): #access database for all tenant data; use other getters to access information/just access once to get 
-        connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
-        client = MongoClient(connection_string, tlsCaFile=ca) 
-        db = client.UserInformation
-        collection = db.UserProfiles
-
-        user = collection.find_one({"username": self.username})
-        if not user:
-            raise UserNotFoundException(f"No landlord user found with the username: {self.username}")
-        
-        client.close()
-
-        return self.from_dict(user)
-
-    def get_housing_group(self, username=None): #access database for housing group
-        if username is None:
-            return self.additional_fields["housing_group"]
-        else:
-            return self.retrieve_tenant_info(username).additional_fields["housing_group"]
-
-    def get_saved_properties(self, username=None): #access database for saved properties
-        if username is None:
-            return self.additional_fields["saved_properties"]
-        else:
-            return self.retrieve_tenant_info(username).additional_fields["saved_properties"]
-    def get_upcoming_tours(self, username=None): #access database for upcoming tours
-        if username is None:
-            return self.additional_fields["upcoming_tours"]
-        else:
-            return self.retrieve_tenant_info(username).additional_fields["upcoming_tours"]
-  
-    def add_housing_group(self, housing_group):
-        if not self.get_housing_group():
-            self.additional_fields["housing_group"] = housing_group
-            self.insert_tenant_info()
-
-    def remove_housing_group(self):
-        self.additional_fields["housing_group"] = None
-        self.insert_tenant_info()
-
-    def insert_new_saved_property(self, saved_property):
-        tenant_info = self.retrieve_tenant_info()
-        saved_properties = tenant_info.additional_fields["saved_properties"]
-        saved_properties.append(saved_property)
-        self.insert_tenant_info()
-
-    def remove_new_saved_property(self, saved_property):
-        tenant_info = self.retrieve_tenant_info()
-        saved_properties = tenant_info.additional_fields["saved_properties"]
-        saved_properties.remove(saved_property)
-        self.insert_tenant_info()
-
-    def add_upcoming_tour(self, tour):
-        tenant_info = self.retrieve_tenant_info()
-        upcoming_tours = tenant_info.additional_fields["upcoming_tours"]
-        upcoming_tours.append(tour)
-        self.insert_tenant_info()
-
-    def remove_upcoming_tour(self, tour):
-        tenant_info = self.retrieve_tenant_info()
-        upcoming_tours = tenant_info.additional_fields["upcoming_tours"]
-        upcoming_tours.remove(tour)
-        self.insert_tenant_info()
-
-    def clear_all_upcoming_tours(self):
-        self.additional_fields["upcoming_tours"] = []
-        self.insert_tenant_info()
-
-    def clear_all_saved_properties(self):
-        self.additional_fields["saved_properties"] = []
-        self.insert_tenant_info()
