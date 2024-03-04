@@ -1,7 +1,7 @@
 from usermodels import User, Tenant
 from housemodels import House, RealEstate, Group, Details
 from roommodels import Rooms, Messages
-from Exceptions import UserNotFoundException, HouseNotFoundException
+from Exceptions import UserNotFoundException, HouseNotFoundException, RoomNotFoundException
 from flask import Flask, request, jsonify
 import bcrypt
 from flask_cors import CORS
@@ -263,6 +263,44 @@ def landlord_handler():
 
     return jsonify({"error": "Method Not Allowed"}), 405
 
+@app.route("/get-room", methods=["GET", "OPTIONS", "POST"])
+def room_handler():
+    """
+    This endpoint retrieves the room containing both users
+    """
+    if request.method == "OPTIONS":
+        # Handle CORS preflight request
+        response = jsonify({"message": "CORS preflight request handled"})
+        response.headers["Access-Control-Allow-Origin"] = (
+            "*"  # Allow requests from any origin
+        )
+        response.headers["Access-Control-Allow-Methods"] = (
+            "GET, POST"  # Allow GET and POST methods
+        )
+        response.headers["Access-Control-Allow-Headers"] = (
+            "Content-Type"  # Allow Content-Type header
+        )
+        return response, 200
+    elif request.method == "GET":
+        sender = request.args.get("sender")
+        receiver = request.args.get("receiver")
+        if not sender or not receiver:
+            return jsonify({"error" : "Sender and Receiver are both required!"}), 400
+        try:
+            room_object = None
+            users_involved = [sender, receiver]
+            room_instance = Rooms(room_users = users_involved, messages = "")
+            for room in room_instance.retrieve_all_rooms():
+                if users_involved.sort() == room["room_users"].sort():
+                    room_object = room
+                    break
+            if room_object is None:
+                return jsonify({"error" : "No room containing both users"}), 500
+            # print(all_housemates_array)
+            return jsonify(room_object), 200
+
+        except RoomNotFoundException as e:
+            return jsonify({"errortest": f"{e}"}), 400
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8090)
