@@ -1,4 +1,4 @@
-from usermodels import User, Tenant
+from usermodels import User
 from housemodels import House, RealEstate, Group, Details
 from roommodels import Rooms, Messages
 from Exceptions import UserNotFoundException, HouseNotFoundException, RoomNotFoundException
@@ -49,6 +49,14 @@ def login_handler():
                 first_name="",
                 last_name="",
                 phone_number="",
+                upcoming_tours = "", # Both landlords and tenants can have this, so this is uniform across both data.
+                #TENANT RELATED DATA
+                pending_requests = "", #stores requestID's sent over by House Clients
+                housing_group = "",
+                saved_properties = "",
+                #LANDLORD RELATED DATA
+                my_properties = ""
+
             )
             user_instance = user_instance.retrieve_user_info(email)
             user_info_dict = user_instance.to_dict()
@@ -124,6 +132,13 @@ def register_handler():
                 phone_number=phone_number,
                 first_name=first_name,
                 last_name=last_name,
+                upcoming_tours = [], # Both landlords and tenants can have this, so this is uniform across both data.
+                #TENANT RELATED DATA
+                pending_requests = [], #stores requestID's sent over by House Clients
+                housing_group = "",
+                saved_properties = [],
+                #LANDLORD RELATED DATA
+                my_properties = []
             )
             if not user_instance.check_new_user():
                 return jsonify({"error": "User already exists"}), 400
@@ -179,6 +194,13 @@ def tenant_handler():
                     first_name="",
                     last_name="",
                     phone_number="",
+                    upcoming_tours = "", # Both landlords and tenants can have this, so this is uniform across both data.
+                    #TENANT RELATED DATA
+                    pending_requests = "", #stores requestID's sent over by House Clients
+                    housing_group = "",
+                    saved_properties = "",
+                    #LANDLORD RELATED DATA
+                    my_properties = ""
                 )
                 user_instance = user_instance.retrieve_user_info(i)
                 user_info_dict = user_instance.to_dict()
