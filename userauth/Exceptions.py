@@ -11,3 +11,6 @@ class RestrictedActionException(Exception):
 
 class HouseNotFoundException(Exception):
     pass
+
+class RoomNotFoundException(Exception):
+    pass

@@ -1,5 +1,6 @@
 from usermodels import User, Tenant
 from housemodels import House, RealEstate, Group, Details
+from roommodels import Rooms, Messages
 from Exceptions import UserNotFoundException, HouseNotFoundException
 from flask import Flask, request, jsonify
 import bcrypt
