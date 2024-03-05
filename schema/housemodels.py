@@ -67,9 +67,9 @@ class House:
                 "details": {
                     "bedroom_count": self.real_estate.details["bedroom_count"],
                     "bathroom_count": self.real_estate.details["bathroom_count"],
-                    # "appliances": self.real_estate.details.appliances,
-                    # "laundry": self.real_estate.details.laundry,
-                    # "pet_friendly": self.real_estate.details.pet_friendly
+                    "appliances": self.real_estate.details["appliances"],
+                    "laundry": self.real_estate.details["laundry"],
+                    "pet_friendly": self.real_estate.details["pet_friendly"]
                 }
             }
         }
@@ -90,4 +90,37 @@ class House:
 
     def print_housing_info(self):
         print(f"Groups: {self.group.all_housemates}")
+
+    @classmethod
+    def retrieve_available_listings_json(cls):
+        connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@houseinfo.5nbfw82.mongodb.net/"
+        client = MongoClient(connection_string, tlsCaFile=ca) 
+        db = client.HousesDatabase
+        collection = db.HouseInfo
+
+        # Retrieve all houses with the 'real_estate.available' field set to True
+        available_houses_data = collection.find({"real_estate.available": True})
+
+        # Create a list of House objects in JSON format
+        available_listings_json = []
+        for house_data in available_houses_data:
+            available_listings_json.append(cls.from_dict(house_data).to_dict())
+
+        client.close()
+
+        return available_listings_json
+
+    ########################################################################
+    # Real Estate Feature Method API Calls
+    # ----------------------------------------------------------------
+    # retrieve_properties(): retrieves basic data of properties of database into array of properties
+    # use retrieve_house_info() to retrieve full house information
+    # request_to_group(tenant_username): Landlord can request tenant to housing group
+    # accept_request_to_group(property_address): Tenant can accept request to join landlord's housing group
+    ########################################################################
+    
+    def request_to_group(self, tenant_username):
+        return NotImplemented
+    
+
     
