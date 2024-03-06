@@ -208,7 +208,7 @@ def retrieve_landlord_property_info(username):
                 house_info = House().retrieve_housing_info(property_address)
                 landlord_property_info.append(house_info.to_dict())
             except HouseNotFoundException as e:
-                # Handle the exception (you can log or raise it as needed)
+                # Handle the exception
                 print(str(e))
 
         return landlord_property_info
