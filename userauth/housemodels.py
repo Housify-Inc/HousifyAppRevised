@@ -41,12 +41,48 @@ class House:
 
     @classmethod
     def from_dict(cls, house_dict):
+        # Extract group and real_estate sub-dictionaries
+        group_dict = house_dict.get('group', {})
+        real_estate_dict = house_dict.get('real_estate', {})
+        
+        # Extract details sub-dictionary from real_estate_dict
+        details_dict = real_estate_dict.get('details', {})
+        
+        # Instantiate Details object from details_dict
+        details = Details(
+            bedroom_count=details_dict.get('bedroom_count'),
+            bathroom_count=details_dict.get('bathroom_count'),
+            appliances=details_dict.get('appliances'),
+            laundry=details_dict.get('laundry'),
+            pet_friendly=details_dict.get('pet_friendly')
+        )
+        
+        # Instantiate RealEstate object, including the Details object
+        real_estate = RealEstate(
+            property_address=real_estate_dict.get('property_address'),
+            property_owner=real_estate_dict.get('property_owner'),
+            available=real_estate_dict.get('available'),
+            rent_price=real_estate_dict.get('rent_price'),
+            images=real_estate_dict.get('images'),
+            introduction=real_estate_dict.get('introduction'),
+            details=details  # Pass the instantiated Details object
+        )
+        
+        # Instantiate Group object
+        group = Group(
+            property_address=group_dict.get('property_address'),
+            property_owner=group_dict.get('property_owner'),
+            all_housemates=group_dict.get('all_housemates')
+        )
+        
+        # Return a new House instance with all nested objects
         return cls(
             property_address=house_dict.get('property_address'),
             property_owner=house_dict.get('property_owner'),
-            group=Group(**house_dict.get('group')),
-            real_estate=RealEstate(**house_dict.get('real_estate'))
+            group=group,
+            real_estate=real_estate
         )
+
 
     def to_dict(self):
         return {
@@ -88,6 +124,25 @@ class House:
 
         return self.from_dict(house)
 
+    @classmethod
+    def retrieve_available_listings_json(cls):
+        connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@houseinfo.5nbfw82.mongodb.net/"
+        client = MongoClient(connection_string, tlsCaFile=ca) 
+        db = client.HousesDatabase
+        collection = db.HouseInfo
+
+        # Retrieve all houses with the 'real_estate.available' field set to True
+        available_houses_data = collection.find({"real_estate.available": True})
+
+        # Create a list of House objects in JSON format
+        available_listings_json = []
+        for house_data in available_houses_data:
+            available_listings_json.append(cls.from_dict(house_data).to_dict())
+
+        client.close()
+
+        return available_listings_json
+    
     def add_house_info(self): #inserts user info into database
         connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@houseinfo.5nbfw82.mongodb.net/"
         client = MongoClient(connection_string, tlsCaFile=ca) 

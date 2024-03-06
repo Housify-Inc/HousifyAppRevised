@@ -212,6 +212,31 @@ def tenant_handler():
 
         except HouseNotFoundException as e:
             return jsonify({"errortest": f"{e}"}), 400
+@app.route("/load_housing", methods = ["GET", "POST", "OPTIONS"])
+def housing_handler():
+    if request.method == "OPTIONS":
+        # Handle CORS preflight request
+        response = jsonify({"message": "CORS preflight request handled"})
+        response.headers["Access-Control-Allow-Origin"] = (
+            "*"  # Allow requests from any origin
+        )
+        response.headers["Access-Control-Allow-Methods"] = (
+            "GET, POST"  # Allow GET and POST methods
+        )
+        response.headers["Access-Control-Allow-Headers"] = (
+            "Content-Type"  # Allow Content-Type header
+        )
+        return response, 200
+    
+    elif request.method == "GET":
+        try:
+            print("here")
+            house_instance = House(
+                property_address="", property_owner="", group="", real_estate=""
+            )
+            return jsonify(house_instance.retrieve_available_listings_json()), 200
+        except HouseNotFoundException as e:
+            return jsonify({"errortest": f"{e}"}), 400
 
 @app.route("/landlord-home", methods=["GET", "POST", "OPTIONS"])
 def landlord_handler():
@@ -274,7 +299,28 @@ def landlord_handler():
                 real_estate=realestate_instance)
             print("Made House Object")
             house_instance.print_housing_info()
-            
+
+            #make a userinstance to update propertieis 
+            user_instance = User(
+                username=owner,
+                password="",
+                payment_info="",
+                user_type="",
+                first_name="",
+                last_name="",
+                phone_number="",
+                upcoming_tours = "", # Both landlords and tenants can have this, so this is uniform across both data.
+                #TENANT RELATED DATA
+                pending_requests = "", #stores requestID's sent over by House Clients
+                housing_group = "",
+                saved_properties = "",
+                #LANDLORD RELATED DATA
+                my_properties = ""
+
+            )
+            user_instance = user_instance.retrieve_user_info(owner)
+            user_instance.add_property(address)
+            user_instance.update_user_properties()
             # add user to DB
             house_instance.add_house_info()
             print("Added House Object")

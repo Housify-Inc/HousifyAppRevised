@@ -141,7 +141,45 @@ class User:
             collection.update_one({"username": username}, {"$set": {"payment_info": new_payment_info}})
         
         client.close()
-    
+
+    def add_property(self, property_info):
+        """
+        Add a property to the user's list of properties and update the database.
+
+        Parameters:
+            property_info (dict): Information about the property to add.
+
+        Raises:
+            UnexpectedLogicException: If the user type is not recognized.
+            UserNotFoundException: If the user is not found in the database.
+        """
+        # Check user type to determine where to add the property
+        if self.user_type == "landlord":
+            # Append property to my_properties
+            self.my_properties.append(property_info)
+            # Update database
+            self.update_user_properties()
+        elif self.user_type == "tenant":
+            # As a tenant, cannot directly add properties
+            raise UnexpectedLogicException("Tenants cannot directly add properties.")
+        else:
+            # If user type is not recognized, raise exception
+            raise UnexpectedLogicException("User type not recognized.")
+
+    def update_user_properties(self):
+        """
+        Update the user's properties in the database.
+        """
+        connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
+        client = MongoClient(connection_string, tlsCAFile=ca)
+        db = client.UserInformation
+        collection = db.UserProfiles
+
+        # Update user document in the database with new properties
+        collection.update_one({"username": self.username}, {"$set": {"my_properties": self.my_properties}})
+
+        client.close()
+
     def add_user_info(self): #inserts user info into database
         connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
         client = MongoClient(connection_string, tlsCaFile=ca) 
