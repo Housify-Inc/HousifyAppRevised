@@ -15,10 +15,6 @@ from flask_cors import CORS
 from bson import ObjectId
 
 app = Flask(__name__)
-client = MongoClient("your_mongodb_connection_string")
-db = client["your_database_name"]
-fs = GridFS(db)
-fs_bucket = GridFSBucket(db)
 CORS(app)
 
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
@@ -28,24 +24,53 @@ def allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-@app.route("/image/<image_id>")
+@app.route("/image/<image_id>", methods=["GET", "OPTIONS"])
 def serve_image(image_id):
-    try:
-        # Convert the string ID to a BSON ObjectId
-        object_id = ObjectId(image_id)
-
-        # Retrieve the image file from GridFS
-        grid_out = fs_bucket.open_download_stream(object_id)
-        contents = grid_out.read()
-
-        # Send the image data back to the client
-        return send_file(
-            io.BytesIO(contents),
-            attachment_filename=grid_out.filename,
-            mimetype=grid_out.content_type,
+    if request.method == "OPTIONS":
+        # Handle CORS preflight request
+        response = jsonify({"message": "CORS preflight request handled"})
+        response.headers["Access-Control-Allow-Origin"] = (
+            "*"  # Allow requests from any origin
         )
-    except Exception as e:
-        return jsonify({"error": str(e)}), 404
+        response.headers["Access-Control-Allow-Methods"] = (
+            "GET, POST"  # Allow GET and POST methods
+        )
+        response.headers["Access-Control-Allow-Headers"] = (
+            "Content-Type"  # Allow Content-Type header
+        )
+        return response, 200
+    
+    elif request.method == "GET":
+        try:
+            user_instance = User(
+                username="",
+                password="",
+                payment_info="",
+                user_type="",
+                first_name="",
+                last_name="",
+                phone_number="",
+                upcoming_tours="",  # Both landlords and tenants can have this, so this is uniform across both data.
+                # TENANT RELATED DATA
+                pending_requests="",  # stores requestID's sent over by House Clients
+                housing_group="",
+                saved_properties="",
+                # LANDLORD RELATED DATA
+                my_properties="",
+            )
+
+            grid_out, contents = user_instance.serve_up_image(image_id)
+
+            # Send the image data back to the client
+            return send_file(
+                io.BytesIO(contents),
+                attachment_filename=grid_out.filename,
+                mimetype=grid_out.content_type,
+            )
+        except Exception as e:
+            return jsonify({"error": str(e)}), 404
+        
+    return jsonify({"error": "Method Not Allowed"}), 405
 
 
 @app.route("/login", methods=["GET", "OPTIONS"])
@@ -166,12 +191,6 @@ def register_handler():
             salt = bcrypt.gensalt(10)
             hashed_password = bcrypt.hashpw(password_to_hash, salt)
 
-            file_id = fs_bucket.upload_from_stream(
-                profile_image.filename,
-                profile_image,
-                metadata={"contentType": profile_image.content_type, "user": email},
-            )
-
             # Create an instance of User
             user_instance = User(
                 username=email,
@@ -181,7 +200,7 @@ def register_handler():
                 phone_number=phone_number,
                 first_name=first_name,
                 last_name=last_name,
-                profile_picture=file_id,
+                profile_picture=profile_image,
                 upcoming_tours=[],  # Both landlords and tenants can have this, so this is uniform across both data.
                 # TENANT RELATED DATA
                 pending_requests=[],  # stores requestID's sent over by House Clients
@@ -264,6 +283,60 @@ def tenant_handler():
             return jsonify({"errortest": f"{e}"}), 400
 
 
+@app.route("/load_housing", methods=["GET", "POST", "OPTIONS"])
+def housing_handler():
+    if request.method == "OPTIONS":
+        # Handle CORS preflight request
+        response = jsonify({"message": "CORS preflight request handled"})
+        response.headers["Access-Control-Allow-Origin"] = (
+            "*"  # Allow requests from any origin
+        )
+        response.headers["Access-Control-Allow-Methods"] = (
+            "GET, POST"  # Allow GET and POST methods
+        )
+        response.headers["Access-Control-Allow-Headers"] = (
+            "Content-Type"  # Allow Content-Type header
+        )
+        return response, 200
+
+    elif request.method == "GET":
+        try:
+            print("here")
+            house_instance = House(
+                property_address="", property_owner="", group="", real_estate=""
+            )
+            return jsonify(house_instance.retrieve_available_listings_json()), 200
+        except HouseNotFoundException as e:
+            return jsonify({"errortest": f"{e}"}), 400
+
+
+@app.route("/load_housing", methods=["GET", "POST", "OPTIONS"])
+def housing_handler():
+    if request.method == "OPTIONS":
+        # Handle CORS preflight request
+        response = jsonify({"message": "CORS preflight request handled"})
+        response.headers["Access-Control-Allow-Origin"] = (
+            "*"  # Allow requests from any origin
+        )
+        response.headers["Access-Control-Allow-Methods"] = (
+            "GET, POST"  # Allow GET and POST methods
+        )
+        response.headers["Access-Control-Allow-Headers"] = (
+            "Content-Type"  # Allow Content-Type header
+        )
+        return response, 200
+
+    elif request.method == "GET":
+        try:
+            print("here")
+            house_instance = House(
+                property_address="", property_owner="", group="", real_estate=""
+            )
+            return jsonify(house_instance.retrieve_available_listings_json()), 200
+        except HouseNotFoundException as e:
+            return jsonify({"errortest": f"{e}"}), 400
+
+
 @app.route("/landlord-home", methods=["GET", "POST", "OPTIONS"])
 def landlord_handler():
     if request.method == "OPTIONS":
@@ -325,6 +398,26 @@ def landlord_handler():
             print("Made House Object")
             house_instance.print_housing_info()
 
+            # make a userinstance to update propertieis
+            user_instance = User(
+                username=owner,
+                password="",
+                payment_info="",
+                user_type="",
+                first_name="",
+                last_name="",
+                phone_number="",
+                upcoming_tours="",  # Both landlords and tenants can have this, so this is uniform across both data.
+                # TENANT RELATED DATA
+                pending_requests="",  # stores requestID's sent over by House Clients
+                housing_group="",
+                saved_properties="",
+                # LANDLORD RELATED DATA
+                my_properties="",
+            )
+            user_instance = user_instance.retrieve_user_info(owner)
+            user_instance.add_property(address)
+            user_instance.update_user_properties()
             # add user to DB
             house_instance.add_house_info()
             print("Added House Object")

@@ -37,9 +37,12 @@ const UserTable = () => {
         setShowMessenger(!showMessenger);
         setSelectedUser(user)
     };
-    const handlePaymentButtonClick = () => {
-        setShowPaymentForm(!showPaymentForm);
+    const handlePaymentButtonClick = (user, event) => {
+        event.preventDefault(); // Prevent default form submission behavior
+        // Assuming user.payment_link contains the payment link for each user
+        window.open(user.payment_info, '_blank'); // Redirect to the payment link
     };
+    
 
 
 
@@ -74,7 +77,7 @@ const UserTable = () => {
                                 </button>
                                 <button
                                     className="flex items-center justify-center px-6 py-1 bg-green-500 text-white rounded-md"
-                                    onClick={handlePaymentButtonClick}
+                                    onClick={(event) => handlePaymentButtonClick(user, event)}
                                 >
                                     <FontAwesomeIcon icon={faMoneyBill} className="mr-1" />
                                     Pay
@@ -84,7 +87,7 @@ const UserTable = () => {
                     ))}
                 </ul>
                 </div>
-                {/* Payment Form */}
+                Payment Form
                 {showPaymentForm && (
                     
                     <div  className="w-half max-w-98 px-10 bg-white rounded-lg py-4 shadow-lg">
