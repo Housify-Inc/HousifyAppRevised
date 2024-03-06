@@ -6,7 +6,7 @@ import certifi
 ca = certifi.where()
 
 class Details:
-    def __init__(self, bedroom_count, bathroom_count, appliances, laundry, pet_friendly):
+    def __init__(self, bedroom_count=None, bathroom_count=None, appliances=None, laundry=None, pet_friendly=None):
         self.bedroom_count = bedroom_count
         self.bathroom_count = bathroom_count
         self.appliances = appliances
@@ -15,7 +15,7 @@ class Details:
 
 
 class RealEstate:
-    def __init__(self, property_address, property_owner, available, rent_price, images, introduction, details):
+    def __init__(self, property_address=None, property_owner=None, available=None, rent_price=None, images=None, introduction=None, details=None):
         self.property_address = property_address
         self.property_owner = property_owner
         self.available = available
@@ -26,14 +26,14 @@ class RealEstate:
 
 
 class Group:
-    def __init__(self, property_address, property_owner, all_housemates):
+    def __init__(self, property_address=None, property_owner=None, all_housemates=None):
         self.property_address = property_address
         self.property_owner = property_owner
         self.all_housemates = all_housemates
 
 
 class House:
-    def __init__(self, property_address, property_owner, group, real_estate):
+    def __init__(self, property_address=None, property_owner=None, group=None, real_estate=None):
         self.property_address = property_address
         self.property_owner = property_owner
         self.group = group

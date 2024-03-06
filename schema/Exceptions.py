@@ -14,3 +14,6 @@ class HouseNotFoundException(Exception):
 
 class RoomNotFoundException(Exception):
     pass
+
+class HouseNotFoundException(Exception):
+    pass

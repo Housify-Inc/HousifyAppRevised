@@ -1,6 +1,8 @@
 from Exceptions import UserNotFoundException
 from Exceptions import UnexpectedLogicException
+from Exceptions import HouseNotFoundException
 from pymongo import MongoClient
+from housemodels import House, Group, RealEstate, Details
 import certifi
 ca = certifi.where()
 
@@ -9,7 +11,7 @@ class User:
     """
     Class for representing a user in the system.
     """
-    def __init__(self, username, password, first_name, last_name, phone_number, payment_info, user_type, pending_requests, housing_group, saved_properties, upcoming_tours, my_properties):
+    def __init__(self, username=None, password=None, first_name=None, last_name=None, phone_number=None, payment_info=None, user_type=None, pending_requests=None, housing_group=None, saved_properties=None, upcoming_tours=None, my_properties=None):
         self.username = username
         self.password = password
         self.first_name = first_name
@@ -176,3 +178,41 @@ class User:
         # Return True if the username doesn't exist, False otherwise
         return valid_user is None
     
+
+    # @classmethod
+# def retrieve_landlord_property_info(landlord_username):
+#     # retrieve the user info first
+#     user_instance = User.retrieve_user_info(landlord_username)
+#     # Check that the user type is landlord
+#     if user_instance.user_type!= "landlord":
+#         raise UserNotFoundException(f"No landlord found with the username: {landlord_username}")
+#     # Retrieve the landlord's property info
+#     return user_instance.my_properties
+
+    # @classmethod
+def retrieve_landlord_property_info(username):
+    # Retrieve the user information
+    user_info = User().retrieve_user_info(username)
+    user_info.print_user_info()
+
+    # Check if the user is a landlord
+    if user_info.user_type == "landlord":
+        print("ENTERED HERE FOR NAIRDELIVERS")
+        # Get the list of property addresses owned by the landlord
+        landlord_properties = user_info.my_properties
+
+        # Retrieve the full information for each property
+        landlord_property_info = []
+        for property_address in landlord_properties:
+            try:
+                house_info = House().retrieve_housing_info(property_address)
+                landlord_property_info.append(house_info.to_dict())
+            except HouseNotFoundException as e:
+                # Handle the exception (you can log or raise it as needed)
+                print(str(e))
+
+        return landlord_property_info
+    else:
+        # If the user is not a landlord, return an empty list
+        return []
+
