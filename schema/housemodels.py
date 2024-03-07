@@ -1,6 +1,7 @@
-from Exceptions import UserNotFoundException, HouseNotFoundException
+from Exceptions import UserNotFoundException, HouseNotFoundException, InvalidUserTypeException, UserAlreadyExistsException
 from Exceptions import UnexpectedLogicException
 from pymongo import MongoClient
+from usermodels import User
 import certifi
 
 ca = certifi.where()
@@ -109,6 +110,24 @@ class House:
         client.close()
 
         return available_listings_json
+    
+    @classmethod
+    def update_housing_info(self):
+        connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@houseinfo.5nbfw82.mongodb.net/"
+        client = MongoClient(connection_string, tlsCaFile=ca) 
+        db = client.HousesDatabase
+        collection = db.HouseInfo
+
+        # Check if the house already exists in the database
+        existing_house = collection.find_one({"property_address": self.property_address})
+
+        if not existing_house:
+            raise HouseNotFoundException(f"No house found with the address: {self.property_address}")
+
+        # Update the house information in the database
+        collection.update_one({"property_address": self.property_address}, {"$set": self.to_dict()})
+
+        client.close()
 
     ########################################################################
     # Real Estate Feature Method API Calls
@@ -119,8 +138,22 @@ class House:
     # accept_request_to_group(property_address): Tenant can accept request to join landlord's housing group
     ########################################################################
     
-    def request_to_group(self, tenant_username):
-        return NotImplemented
+    def request_to_group(self, tenant_username): #Requests user on behalf of house to join group
+        # retrieve user's info
+        user_instance = User.retrieve_user_info(tenant_username)
+        # Check that the user type is landlord or if it is already in group (invalid cases to request)
+        if user_instance.user_type == "landlord":
+            raise InvalidUserTypeException(f"Invalid user type: {tenant_username}")
+        if tenant_username in self.group["all_housemates"]:
+            raise UserAlreadyExistsException(f"User {tenant_username} already exists in {self.property_address}")
+        # Create requestID
+        request_id = f"{tenant_username}-{self.property_address}"
+        # Add request to user's pending_requests field
+        user_instance.pending_requests.append(request_id)
+        # update user's information in database
+        user_instance.update_user_info()
+        
+        return request_id
     
 
     

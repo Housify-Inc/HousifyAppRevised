@@ -17,3 +17,9 @@ class RoomNotFoundException(Exception):
 
 class HouseNotFoundException(Exception):
     pass
+
+class InvalidUserTypeException(Exception):
+    pass
+
+class UserAlreadyExistsException(Exception):
+    pass
