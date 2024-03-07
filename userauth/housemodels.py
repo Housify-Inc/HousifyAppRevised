@@ -6,7 +6,7 @@ import certifi
 ca = certifi.where()
 
 class Details:
-    def __init__(self, bedroom_count, bathroom_count, appliances, laundry, pet_friendly):
+    def __init__(self, bedroom_count=None, bathroom_count=None, appliances=None, laundry=None, pet_friendly=None):
         self.bedroom_count = bedroom_count
         self.bathroom_count = bathroom_count
         self.appliances = appliances
@@ -15,7 +15,7 @@ class Details:
 
 
 class RealEstate:
-    def __init__(self, property_address, property_owner, available, rent_price, images, introduction, details):
+    def __init__(self, property_address=None, property_owner=None, available=None, rent_price=None, images=None, introduction=None, details=None):
         self.property_address = property_address
         self.property_owner = property_owner
         self.available = available
@@ -26,14 +26,14 @@ class RealEstate:
 
 
 class Group:
-    def __init__(self, property_address, property_owner, all_housemates):
+    def __init__(self, property_address=None, property_owner=None, all_housemates=None):
         self.property_address = property_address
         self.property_owner = property_owner
         self.all_housemates = all_housemates
 
 
 class House:
-    def __init__(self, property_address, property_owner, group, real_estate):
+    def __init__(self, property_address=None, property_owner=None, group=None, real_estate=None):
         self.property_address = property_address
         self.property_owner = property_owner
         self.group = group
@@ -41,48 +41,12 @@ class House:
 
     @classmethod
     def from_dict(cls, house_dict):
-        # Extract group and real_estate sub-dictionaries
-        group_dict = house_dict.get('group', {})
-        real_estate_dict = house_dict.get('real_estate', {})
-        
-        # Extract details sub-dictionary from real_estate_dict
-        details_dict = real_estate_dict.get('details', {})
-        
-        # Instantiate Details object from details_dict
-        details = Details(
-            bedroom_count=details_dict.get('bedroom_count'),
-            bathroom_count=details_dict.get('bathroom_count'),
-            appliances=details_dict.get('appliances'),
-            laundry=details_dict.get('laundry'),
-            pet_friendly=details_dict.get('pet_friendly')
-        )
-        
-        # Instantiate RealEstate object, including the Details object
-        real_estate = RealEstate(
-            property_address=real_estate_dict.get('property_address'),
-            property_owner=real_estate_dict.get('property_owner'),
-            available=real_estate_dict.get('available'),
-            rent_price=real_estate_dict.get('rent_price'),
-            images=real_estate_dict.get('images'),
-            introduction=real_estate_dict.get('introduction'),
-            details=details  # Pass the instantiated Details object
-        )
-        
-        # Instantiate Group object
-        group = Group(
-            property_address=group_dict.get('property_address'),
-            property_owner=group_dict.get('property_owner'),
-            all_housemates=group_dict.get('all_housemates')
-        )
-        
-        # Return a new House instance with all nested objects
         return cls(
             property_address=house_dict.get('property_address'),
             property_owner=house_dict.get('property_owner'),
-            group=group,
-            real_estate=real_estate
+            group=Group(**house_dict.get('group')),
+            real_estate=RealEstate(**house_dict.get('real_estate'))
         )
-
 
     def to_dict(self):
         return {
@@ -101,11 +65,11 @@ class House:
                 "images": self.real_estate.images,
                 "introduction": self.real_estate.introduction,
                 "details": {
-                    "bedroom_count": self.real_estate.details.bedroom_count,
-                    "bathroom_count": self.real_estate.details.bathroom_count,
-                    "appliances": self.real_estate.details.appliances,
-                    "laundry": self.real_estate.details.laundry,
-                    "pet_friendly": self.real_estate.details.pet_friendly
+                    "bedroom_count": self.real_estate.details["bedroom_count"],
+                    "bathroom_count": self.real_estate.details["bathroom_count"],
+                    "appliances": self.real_estate.details["appliances"],
+                    "laundry": self.real_estate.details["laundry"],
+                    "pet_friendly": self.real_estate.details["pet_friendly"]
                 }
             }
         }
@@ -123,6 +87,9 @@ class House:
         client.close()
 
         return self.from_dict(house)
+
+    def print_housing_info(self):
+        print(f"Groups: {self.group.all_housemates}")
 
     @classmethod
     def retrieve_available_listings_json(cls):
@@ -142,18 +109,18 @@ class House:
         client.close()
 
         return available_listings_json
+
+    ########################################################################
+    # Real Estate Feature Method API Calls
+    # ----------------------------------------------------------------
+    # retrieve_properties(): retrieves basic data of properties of database into array of properties
+    # use retrieve_house_info() to retrieve full house information
+    # request_to_group(tenant_username): Landlord can request tenant to housing group
+    # accept_request_to_group(property_address): Tenant can accept request to join landlord's housing group
+    ########################################################################
     
-    def add_house_info(self): #inserts user info into database
-        connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@houseinfo.5nbfw82.mongodb.net/"
-        client = MongoClient(connection_string, tlsCaFile=ca) 
-        db = client.HousesDatabase
-        collection = db.HouseInfo
-        print('got here')
-        house_data = self.to_dict()
-        collection.insert_one(house_data)
+    def request_to_group(self, tenant_username):
+        return NotImplemented
+    
 
-        client.close()
-
-    def print_housing_info(self):
-        print(f"Groups: {self.group.all_housemates}")
     
