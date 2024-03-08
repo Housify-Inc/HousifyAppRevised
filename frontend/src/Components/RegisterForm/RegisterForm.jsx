@@ -79,25 +79,38 @@ const RegisterForm = () => {
             // Check if registration was successful
             if (response.ok) {
                 const responseData = await response.json();
-                console.log(responseData);
 
-                // now get the profile image
-                const response2 = await fetch(`http://localhost:8090/image/${responseData.profile_picture}`, {
-                    method: 'POST',
-                    body: formData,
-                });
-                if (response2.ok) {
-                
+                try {
+                    // now get the profile image
+                    const response2 = await fetch(`http://localhost:8090/image/${responseData.profile_picture}`, {
+                        method: 'GET',
+                    });
+
+                    if (response2.ok) {
+                        // converts the image data to be able to be loaded into profile image in front-end
+                        const blob = await response2.blob(); // Convert the response to a Blob
+                        const imageUrl = URL.createObjectURL(blob); // Create an object URL for the Blob
+                        responseData.profile_picture = imageUrl;
+                    }
+                    else {
+                        alert(response2.error || 'Something went wrong with trying to fetch profile picture');
+                    }
                 }
+                catch (error) {
+                    console.error('Failed to load image properly:', error);
+                }
+
     
                 if (responseData.user_type === 'landlord') {
                     // Navigate to Landlord page
                     console.log('landlord');
+                    console.log(responseData);
                     // change this navigation to landlord page
                     navigate('/landlord-home');
                 } else if (responseData.user_type === 'tenant') {
                     // Navigate to Tenant page
                     console.log('tenant');
+                    console.log(responseData);
                     // change this navigation to tenant page
                     navigate('/tenant-home');
                 }

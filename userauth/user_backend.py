@@ -12,7 +12,7 @@ from flask import Flask, request, jsonify, send_file
 import bcrypt
 import io
 from flask_cors import CORS
-from bson import ObjectId
+import traceback
 
 app = Flask(__name__)
 CORS(app)
@@ -39,7 +39,7 @@ def serve_image(image_id):
             "Content-Type"  # Allow Content-Type header
         )
         return response, 200
-    
+
     elif request.method == "GET":
         try:
             user_instance = User(
@@ -57,19 +57,25 @@ def serve_image(image_id):
                 saved_properties="",
                 # LANDLORD RELATED DATA
                 my_properties="",
+                profile_picture="",
             )
-
             grid_out, contents = user_instance.serve_up_image(image_id)
 
             # Send the image data back to the client
-            return send_file(
-                io.BytesIO(contents),
-                attachment_filename=grid_out.filename,
-                mimetype=grid_out.content_type,
+            return (
+                send_file(
+                    io.BytesIO(contents),
+                    mimetype=grid_out.content_type,
+                    as_attachment=True,
+                    download_name=grid_out.filename,
+                ),
+                200,
             )
         except Exception as e:
+            print("\n\nThis exception is getting triggered\n\n")
+            traceback.print_exc()
             return jsonify({"error": str(e)}), 404
-        
+
     return jsonify({"error": "Method Not Allowed"}), 405
 
 
@@ -279,33 +285,6 @@ def tenant_handler():
             # print(all_housemates_array)
             return jsonify(all_housemates_array), 200
 
-        except HouseNotFoundException as e:
-            return jsonify({"errortest": f"{e}"}), 400
-
-
-@app.route("/load_housing", methods=["GET", "POST", "OPTIONS"])
-def housing_handler():
-    if request.method == "OPTIONS":
-        # Handle CORS preflight request
-        response = jsonify({"message": "CORS preflight request handled"})
-        response.headers["Access-Control-Allow-Origin"] = (
-            "*"  # Allow requests from any origin
-        )
-        response.headers["Access-Control-Allow-Methods"] = (
-            "GET, POST"  # Allow GET and POST methods
-        )
-        response.headers["Access-Control-Allow-Headers"] = (
-            "Content-Type"  # Allow Content-Type header
-        )
-        return response, 200
-
-    elif request.method == "GET":
-        try:
-            print("here")
-            house_instance = House(
-                property_address="", property_owner="", group="", real_estate=""
-            )
-            return jsonify(house_instance.retrieve_available_listings_json()), 200
         except HouseNotFoundException as e:
             return jsonify({"errortest": f"{e}"}), 400
 

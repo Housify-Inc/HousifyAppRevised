@@ -7,6 +7,7 @@ from bson import ObjectId
 
 ca = certifi.where()
 
+
 class User:
     """
     Class for representing a user in the system.
@@ -79,7 +80,7 @@ class User:
             "saved_properties": self.saved_properties,
             "upcoming_tours": self.upcoming_tours,
             "my_properties": self.my_properties,
-            "profile_picture": self.profile_picture,
+            "profile_picture": str(self.profile_picture),
         }
         return user_dict
 
@@ -223,9 +224,12 @@ class User:
         fs_bucket = GridFSBucket(db)
 
         file_id = fs_bucket.upload_from_stream(
-                self.profile_picture.filename,
-                self.profile_picture,
-                metadata={"contentType": self.profile_picture.content_type, "user": self.username},
+            self.profile_picture.filename,
+            self.profile_picture,
+            metadata={
+                "contentType": self.profile_picture.content_type,
+                "user": self.username,
+            },
         )
 
         self.profile_picture = file_id
@@ -262,7 +266,7 @@ class User:
         connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
         client = MongoClient(connection_string, tlsCaFile=ca)
         db = client.UserInformation
-        
+
         # Retrieve the image file from GridFS
         fs_bucket = GridFSBucket(db)
         object_id = ObjectId(image_id)
