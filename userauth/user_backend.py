@@ -26,6 +26,9 @@ def allowed_file(filename):
 
 @app.route("/image/<image_id>", methods=["GET", "OPTIONS"])
 def serve_image(image_id):
+    """
+    Serves up profile image for user from MongoDB
+    """
     if request.method == "OPTIONS":
         # Handle CORS preflight request
         response = jsonify({"message": "CORS preflight request handled"})

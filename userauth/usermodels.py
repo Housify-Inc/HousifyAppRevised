@@ -1,6 +1,8 @@
 from Exceptions import UserNotFoundException
 from Exceptions import UnexpectedLogicException
+from Exceptions import HouseNotFoundException
 from pymongo import MongoClient
+from housemodels import House, Group, RealEstate, Details
 from gridfs import GridFS, GridFSBucket
 import certifi
 from bson import ObjectId
@@ -12,23 +14,7 @@ class User:
     """
     Class for representing a user in the system.
     """
-
-    def __init__(
-        self,
-        username,
-        password,
-        first_name,
-        last_name,
-        phone_number,
-        payment_info,
-        user_type,
-        pending_requests,
-        housing_group,
-        saved_properties,
-        upcoming_tours,
-        my_properties,
-        profile_picture,
-    ):
+    def __init__(self, username=None, password=None, first_name=None, last_name=None, phone_number=None, payment_info=None, user_type=None, pending_requests=None, housing_group=None, saved_properties=None, upcoming_tours=None, my_properties=None, profile_picture=None):
         self.username = username
         self.password = password
         self.first_name = first_name
@@ -168,53 +154,11 @@ class User:
                 {"$set": {"payment_info": new_payment_info}},
             )
         else:
-            collection.update_one(
-                {"username": username}, {"$set": {"payment_info": new_payment_info}}
-            )
-
+            collection.update_one({"username": username}, {"$set": {"payment_info": new_payment_info}})
+        
         client.close()
-
-    def add_property(self, property_info):
-        """
-        Add a property to the user's list of properties and update the database.
-
-        Parameters:
-            property_info (dict): Information about the property to add.
-
-        Raises:
-            UnexpectedLogicException: If the user type is not recognized.
-            UserNotFoundException: If the user is not found in the database.
-        """
-        # Check user type to determine where to add the property
-        if self.user_type == "landlord":
-            # Append property to my_properties
-            self.my_properties.append(property_info)
-            # Update database
-            self.update_user_properties()
-        elif self.user_type == "tenant":
-            # As a tenant, cannot directly add properties
-            raise UnexpectedLogicException("Tenants cannot directly add properties.")
-        else:
-            # If user type is not recognized, raise exception
-            raise UnexpectedLogicException("User type not recognized.")
-
-    def update_user_properties(self):
-        """
-        Update the user's properties in the database.
-        """
-        connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
-        client = MongoClient(connection_string, tlsCAFile=ca)
-        db = client.UserInformation
-        collection = db.UserProfiles
-
-        # Update user document in the database with new properties
-        collection.update_one(
-            {"username": self.username}, {"$set": {"my_properties": self.my_properties}}
-        )
-
-        client.close()
-
-    def add_user_info(self):  # inserts user info into database
+    
+    def add_user_info(self): #inserts user info into database
         connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
         client = MongoClient(connection_string, tlsCaFile=ca)
         db = client.UserInformation
@@ -261,7 +205,7 @@ class User:
 
         # Return True if the username doesn't exist, False otherwise
         return valid_user is None
-
+    
     def serve_up_image(self, image_id):
         connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
         client = MongoClient(connection_string, tlsCaFile=ca)
@@ -275,3 +219,42 @@ class User:
 
         # Send the image data back to the server
         return grid_out, contents
+    
+
+    # @classmethod
+# def retrieve_landlord_property_info(landlord_username):
+#     # retrieve the user info first
+#     user_instance = User.retrieve_user_info(landlord_username)
+#     # Check that the user type is landlord
+#     if user_instance.user_type!= "landlord":
+#         raise UserNotFoundException(f"No landlord found with the username: {landlord_username}")
+#     # Retrieve the landlord's property info
+#     return user_instance.my_properties
+
+    # @classmethod
+def retrieve_landlord_property_info(username):
+    # Retrieve the user information
+    user_info = User().retrieve_user_info(username)
+    user_info.print_user_info()
+
+    # Check if the user is a landlord
+    if user_info.user_type == "landlord":
+        print("ENTERED HERE FOR NAIRDELIVERS")
+        # Get the list of property addresses owned by the landlord
+        landlord_properties = user_info.my_properties
+
+        # Retrieve the full information for each property
+        landlord_property_info = []
+        for property_address in landlord_properties:
+            try:
+                house_info = House().retrieve_housing_info(property_address)
+                landlord_property_info.append(house_info.to_dict())
+            except HouseNotFoundException as e:
+                # Handle the exception
+                print(str(e))
+
+        return landlord_property_info
+    else:
+        # If the user is not a landlord, return an empty list
+        return []
+

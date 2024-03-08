@@ -88,8 +88,8 @@ const RegisterForm = () => {
 
                     if (response2.ok) {
                         // converts the image data to be able to be loaded into profile image in front-end
-                        const blob = await response2.blob(); // Convert the response to a Blob
-                        const imageUrl = URL.createObjectURL(blob); // Create an object URL for the Blob
+                        const blob = await response2.blob();
+                        const imageUrl = URL.createObjectURL(blob);
                         responseData.profile_picture = imageUrl;
                     }
                     else {
