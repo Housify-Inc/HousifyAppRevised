@@ -178,18 +178,37 @@ class User:
         # Return True if the username doesn't exist, False otherwise
         return valid_user is None
     
+    def update_user_info(self): #update's user's information if changes are made locally (e.g. when requests are being added or removed)
+        connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
+        client = MongoClient(connection_string, tlsCaFile=ca) 
+        db = client.UserInformation
+        collection = db.UserProfiles
 
-    # @classmethod
-# def retrieve_landlord_property_info(landlord_username):
-#     # retrieve the user info first
-#     user_instance = User.retrieve_user_info(landlord_username)
-#     # Check that the user type is landlord
-#     if user_instance.user_type!= "landlord":
-#         raise UserNotFoundException(f"No landlord found with the username: {landlord_username}")
-#     # Retrieve the landlord's property info
-#     return user_instance.my_properties
+        # Convert the current user instance to a dictionary
+        user_data = self.to_dict()
 
-    # @classmethod
+        # Update the user information in the database
+        collection.update_one({"username": self.username}, {"$set": user_data})
+
+        client.close()
+        return True
+
+    def accept_request(self, request_id): #joins new user to housing group
+    # Parse the request
+        property_address, username = request_id.split("-")
+        house_instance = House().retrieve_housing_info(property_address)
+        if username is not self.username: 
+            raise UnexpectedLogicException(f"expected username of {self.username}, but got {username}")
+        if house_instance is None:
+            raise HouseNotFoundException(f"property {property_address} not found")
+        self.pending_requests.remove(request_id)
+        # Updating the user_instance with the new information
+        self.update_user_info()
+        house_instance.group["all_housemates"].append(self.username)
+        # Updating the house_instance with the new information
+        house_instance.update_housing_info()
+
+
 def retrieve_landlord_property_info(username):
     # Retrieve the user information
     user_info = User().retrieve_user_info(username)
@@ -215,4 +234,5 @@ def retrieve_landlord_property_info(username):
     else:
         # If the user is not a landlord, return an empty list
         return []
+
 
