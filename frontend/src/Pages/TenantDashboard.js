@@ -1,16 +1,12 @@
 import { Fragment } from 'react'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Groups from '../Components/Groups'
 import Cards from '../Components/Cards'
 import Tours from '../Components/MyTours'
-const user = {
-  name: 'Tom Cook',
-  email: 'tom@example.com',
-  imageUrl:
-    'https://media.licdn.com/dms/image/C5603AQFZmW2Nm7k2AQ/profile-displayphoto-shrink_800_800/0/1663648587937?e=2147483647&v=beta&t=lKfL6zxaowtklDGfMJw1jMrpkFHQd4YC4t3ADVv0ef0',
-}
+import { getResponseData } from '../ResponseHandler'
+
 const initialNavigation = [
   // { name: 'Dashboard', href: '#', current: true },
   { name: 'Housing Near Me', href: '#', current: true },
@@ -28,6 +24,36 @@ function classNames(...classes) {
 }
 
 export default function TenantDashboard() {
+  console.log("Hello11111");
+  const responseData = getResponseData();
+  console.log(responseData);
+  const [user, setUser] = useState({
+    name: 'Tom Cook',
+    email: 'tom@example.com',
+    imageUrl: null
+  });
+  useEffect(() => {
+    const fetchProfilePicture = async () => {
+      try {
+        console.log("in try");
+        const response = await fetch(`http://localhost:8090/image/${responseData.profile_picture}`);
+        if (response.ok) {
+          console.log("response ok")
+          const blob = await response.blob();
+          const imageUrl = URL.createObjectURL(blob);
+          responseData.profile_picture = imageUrl;
+          setUser(prevUser => ({ ...prevUser, imageUrl }));
+        } else {
+          console.error('Failed to fetch profile picture:', response.status);
+        }
+      } catch (error) {
+        console.error('Failed to load image properly:', error);
+      }
+    };
+
+    fetchProfilePicture();
+  }, []);
+
   const [navigation, setNavigation] = useState(initialNavigation);
 
   const handleNavigationClick = (clickedIndex) => {
@@ -108,7 +134,7 @@ export default function TenantDashboard() {
                           <Menu.Button className="relative flex max-w-xs items-center rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                             <span className="absolute -inset-1.5" />
                             <span className="sr-only">Open user menu</span>
-                            <img className="h-8 w-8 rounded-full" src={user.imageUrl} alt="" />
+                            <img className="h-8 w-8 rounded-full" src={responseData.profile_picture} alt="" />
                           </Menu.Button>
                         </div>
                         <Transition

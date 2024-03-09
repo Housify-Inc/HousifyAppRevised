@@ -28,8 +28,6 @@ const UserTable = () => {
             });
             const groupData = await response.json();
             setUsers(groupData);
-            const filteredUsers = groupData.filter(user => user.username !== responseData.username);
-            setUsers(filteredUsers);
             setIsLoading(false); // Set loading to false after data is fetched
         };
 
@@ -65,18 +63,9 @@ const UserTable = () => {
 
     return (
         <div className="container mx-auto px-2 py-8 flex">
-            <div className="w-half max-w-98 px-10 bg-white rounded-lg py-4 shadow-lg" >
+            <div className="w-half max-w-98 px-10 bg-white rounded-lg py-4 shadow-lg" style={{ paddingTop: '10vh' }}>
                 <div className="max-w-98 px-10">
                     <div className="mb-4">
-                        <h1 className="text-xl font-bold">{responseData.housing_group}
-                        <button
-                            className="flex px-2 py-1 bg-blue-500 text-white rounded-md mr-2"
-                            // onClick={() => handleMessageClick()}
-                        >
-                            <FontAwesomeIcon icon={faComment} className="mr-1" />
-                                Message Group 
-                        </button>
-                        </h1>
                         <h1 className="text-xl font-bold">My Housing Group</h1>
                     </div>
                 </div>
