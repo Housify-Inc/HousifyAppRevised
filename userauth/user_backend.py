@@ -1,4 +1,4 @@
-from usermodels import User
+from usermodels import User, retrieve_landlord_property_info
 from housemodels import House, RealEstate, Group, Details
 from roommodels import Rooms, Messages
 from pymongo import MongoClient
@@ -318,6 +318,28 @@ def housing_handler():
         except HouseNotFoundException as e:
             return jsonify({"errortest": f"{e}"}), 400
 
+@app.route("/landlord_properties", methods=["GET", "POST", "OPTIONS"])
+def properties_handler():
+    if request.method == "OPTIONS":
+        # Handle CORS preflight request
+        response = jsonify({"message": "CORS preflight request handled"})
+        response.headers["Access-Control-Allow-Origin"] = (
+            "*"  # Allow requests from any origin
+        )
+        response.headers["Access-Control-Allow-Methods"] = (
+            "GET, POST"  # Allow GET and POST methods
+        )
+        response.headers["Access-Control-Allow-Headers"] = (
+            "Content-Type"  # Allow Content-Type header
+        )
+        return response, 200
+
+    elif request.method == "GET":
+        landlord = request.args.get("username")
+        try:
+            return jsonify(retrieve_landlord_property_info(landlord)), 200
+        except HouseNotFoundException as e:
+            return jsonify({"errortest": f"{e}"}), 400
 
 @app.route("/landlord-home", methods=["GET", "POST", "OPTIONS"])
 def landlord_handler():
