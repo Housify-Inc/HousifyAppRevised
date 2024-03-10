@@ -6,22 +6,21 @@ import { Chat } from "./Chat";
 
 
 
-function Messenger({initialRoom}) {
+function Messenger({receiver_email_input}) {
 
-  console.log(getResponseData());
+  console.log("Printing Response Data " + getResponseData());
 
 
-
-  const [room, setRoom] = useState(initialRoom);
-  console.log(room)
+  const [receiver_email, setRoom] = useState(receiver_email_input);
+  console.log("Email Address: " + receiver_email)
   const roomInputRef = useRef(null);
 
 
   
   return (
     <div style={{ fontFamily: 'Arial, sans-serif', textAlign: 'center', paddingTop: '50px' }}>
-      {room ? (
-        <Chat room={room} />
+      {receiver_email ? (
+        <Chat receiver_email={receiver_email} />
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <label style={{ marginBottom: '10px', fontSize: '18px' }}>Enter Person Name:</label>

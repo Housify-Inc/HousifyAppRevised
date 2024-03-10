@@ -38,7 +38,8 @@ const UserTable = () => {
 
     const handleMessageClick = (user) => {
         setShowMessenger(!showMessenger);
-        setSelectedUser(user);
+        setSelectedUser(user)
+        console.log(user);
     };
 
     const handlePaymentButtonClick = (user, event) => {
@@ -108,18 +109,26 @@ const UserTable = () => {
                         </li>
                     ))}
                 </ul>
-            </div>
-            {showPaymentForm && (
-                <div className="w-half max-w-98 px-10 bg-white rounded-lg py-4 shadow-lg">
-                    <h2 className="text-xl font-bold mb-2">Payment Form</h2>
-                    <Payment />
                 </div>
-            )}
-            {showMessenger && (
-                <div className="w-half max-w-98 px-10 bg-white rounded-lg py-4 shadow-lg">
-                    <Messenger initialRoom={`${selectedUser.first_name} ${selectedUser.last_name}`} />
-                </div>
-            )}
+                {/* Payment Form */}
+                {showPaymentForm && (
+                    
+                    <div  className="w-half max-w-98 px-10 bg-white rounded-lg py-4 shadow-lg">
+                        <h2 className="text-xl font-bold mb-2">Payment Form</h2>
+                            <Payment/>
+                        {/* <form>
+                            <label htmlFor="paymentAmount">Payment Amount:</label>
+                            <input type="text" id="paymentAmount" name="paymentAmount" />
+                            <button type="submit" className="mt-2 bg-blue-500 text-white px-4 py-2 rounded-md">Submit Payment</button>
+                        </form> */}
+                    </div>
+                    )
+                }
+                {showMessenger && (
+                    <div  className="w-half max-w-98 px-10 bg-white rounded-lg py-4 shadow-lg">
+                    <Messenger receiver_email_input={`${selectedUser.username}`}/>
+                    </div>
+                )}
         </div>
     );
 };

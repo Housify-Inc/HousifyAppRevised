@@ -1,5 +1,6 @@
 from Exceptions import RoomNotFoundException
 from pymongo import MongoClient
+from bson import ObjectId
 import certifi
 
 ca = certifi.where()
@@ -52,7 +53,7 @@ class Rooms:
         self.db = self.client.DM
         self.collection = self.db.DirectMessages
 
-        room = self.collection.find_one({"_id": id})
+        room = self.collection.find_one({"_id": ObjectId(id)})
 
         if not room:
             raise RoomNotFoundException(f"No Room found with id: {id}")
@@ -67,7 +68,7 @@ class Rooms:
         self.db = self.client.DM
         self.collection = self.db.DirectMessages
 
-        room = self.collection.find_one({"_id": id})
+        room = self.collection.find_one({"_id": ObjectId(id)})
 
         if not room:
             raise RoomNotFoundException(f"No Room found with id: {id}")
@@ -82,7 +83,7 @@ class Rooms:
         self.db = self.client.DM
         self.collection = self.db.DirectMessages
 
-        room = self.collection.find_one({"_id": id})
+        room = self.collection.find_one({"_id": ObjectId(id)})
 
         if not room:
             raise RoomNotFoundException(f"No Room found with id: {id}")
@@ -96,13 +97,25 @@ class Rooms:
         cursor = self.collection.find({})
         roomArray = []
         for room in cursor:
-            room["_id"] = ""
+            room["_id"] = str(room["_id"])
             roomArray.append(room)
         return roomArray
+    
+    def add_message(self, id, new_message):
+        self.client = MongoClient(
+            "mongodb+srv://housify-customer-account-test1:housify-customer-test1@directmessages.xzfffoj.mongodb.net/",
+            tlsCaFile=ca,
+        )
+        self.db = self.client.DM
+        self.collection = self.db.DirectMessages
+        room = self.collection.update_one(
+            {"_id": ObjectId(id)},
+            {"$push": {"messages": {"text": new_message.text, "timestamp": new_message.timestamp, "sender": new_message.sender}}}
+        )
+       
+
 
     def print_room_info(self):
         print("Room Information")
         print(f"Room Users: {self.room_users}")
-        print(f"Message Text: {self.messages.text}")
-        print(f"Message Timestamp: {self.messages.timestamp}")
-        print(f"Sender: {self.messages.sender}")
+        print(f"Message Text: {self.messages}")
