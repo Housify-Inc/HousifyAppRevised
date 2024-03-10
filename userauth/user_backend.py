@@ -341,6 +341,35 @@ def properties_handler():
         except HouseNotFoundException as e:
             return jsonify({"errortest": f"{e}"}), 400
 
+@app.route("/group-request", methods = ["GET", "OPTIONS", "POST"])
+def request_handler():
+    if request.method == "OPTIONS":
+        # Handle CORS preflight request
+        response = jsonify({"message": "CORS preflight request handled"})
+        response.headers["Access-Control-Allow-Origin"] = (
+            "*"  # Allow requests from any origin
+        )
+        response.headers["Access-Control-Allow-Methods"] = (
+            "GET, POST"  # Allow GET and POST methods
+        )
+        response.headers["Access-Control-Allow-Headers"] = (
+            "Content-Type"  # Allow Content-Type header
+        )
+        return response, 200
+    elif request.method == "POST":
+        data = request.json
+        username = data.get("email")
+        address = data.get("property_address")
+        try:
+            house_instance = House(property_address=address)
+            house_instance.request_to_group(username)
+            house_instance.print_housing_info()
+            return jsonify(house_instance.to_dict()), 201
+
+        except Exception as e:
+            return jsonify({"error": str(e)}), 400
+    return jsonify({"error": "Method Not Allowed"}), 405
+
 @app.route("/landlord-home", methods=["GET", "POST", "OPTIONS"])
 def landlord_handler():
     if request.method == "OPTIONS":
@@ -431,7 +460,6 @@ def landlord_handler():
             return jsonify({"error": str(e)}), 400
 
     return jsonify({"error": "Method Not Allowed"}), 405
-
 
 @app.route("/get-room", methods=["GET", "OPTIONS", "POST"])
 def room_handler():
