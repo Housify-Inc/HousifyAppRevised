@@ -24,6 +24,53 @@ def allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
+@app.route("/property-image/<image_id>", methods=["GET", "OPTIONS"])
+def serve_image_handler(image_id):
+    """
+    Serves up profile image for user from MongoDB
+    """
+    if request.method == "OPTIONS":
+        # Handle CORS preflight request
+        response = jsonify({"message": "CORS preflight request handled"})
+        response.headers["Access-Control-Allow-Origin"] = (
+            "*"  # Allow requests from any origin
+        )
+        response.headers["Access-Control-Allow-Methods"] = (
+            "GET, POST"  # Allow GET and POST methods
+        )
+        response.headers["Access-Control-Allow-Headers"] = (
+            "Content-Type"  # Allow Content-Type header
+        )
+        return response, 200
+
+    elif request.method == "GET":
+        try:
+            house_instance = House(
+                property_address="",
+                property_owner="",
+                group="",
+                real_estate="",
+            )
+            grid_out, contents = house_instance.serve_up_image(image_id)
+
+            # Send the image data back to the client
+            return (
+                send_file(
+                    io.BytesIO(contents),
+                    mimetype=grid_out.content_type,
+                    as_attachment=True,
+                    download_name=grid_out.filename,
+                ),
+                200,
+            )
+        except Exception as e:
+            print("\n\nThis exception is getting triggered\n\n")
+            traceback.print_exc()
+            return jsonify({"error": str(e)}), 404
+
+    return jsonify({"error": "Method Not Allowed"}), 405
+
+
 @app.route("/image/<image_id>", methods=["GET", "OPTIONS"])
 def serve_image(image_id):
     """
@@ -318,6 +365,7 @@ def housing_handler():
         except HouseNotFoundException as e:
             return jsonify({"errortest": f"{e}"}), 400
 
+
 @app.route("/landlord_properties", methods=["GET", "POST", "OPTIONS"])
 def properties_handler():
     if request.method == "OPTIONS":
@@ -341,7 +389,8 @@ def properties_handler():
         except HouseNotFoundException as e:
             return jsonify({"errortest": f"{e}"}), 400
 
-@app.route("/group-request", methods = ["GET", "OPTIONS", "POST"])
+
+@app.route("/group-request", methods=["GET", "OPTIONS", "POST"])
 def request_handler():
     if request.method == "OPTIONS":
         # Handle CORS preflight request
@@ -370,6 +419,7 @@ def request_handler():
             return jsonify({"error": str(e)}), 400
     return jsonify({"error": "Method Not Allowed"}), 405
 
+
 @app.route("/landlord-home", methods=["GET", "POST", "OPTIONS"])
 def landlord_handler():
     if request.method == "OPTIONS":
@@ -388,18 +438,30 @@ def landlord_handler():
 
     elif request.method == "POST":
         try:
+            # if "propertyImage" not in request.files:
+            #     return jsonify({"error": "Property image is required"}), 400
+
+            # profile_image = request.files["propertyImage"]
+            # # Validate file name or type if necessary
+            # if not allowed_file(profile_image.filename):
+            #     return jsonify({"error": "File type not allowed"}), 400
+
             # extract request body
-            data = request.json
-            address = data.get("property_address")
-            intoduction = data.get("introduction")
-            owner = data.get("property_owner")
-            bedroom_count = data.get("bedroom_count")
-            bathroom_count = data.get("bathroom_count")
-            rent_price = data.get("rent_prices")
-            laundry = data.get("laundry")
-            pet_friendly = data.get("pet_friendly")
-            images = data.get("images")
-            available = data.get("available")
+            address = request.form["property_address"]
+            introduction = request.form["introduction"]
+            owner = request.form["property_owner"]
+            bedroom_count = int(request.form["bedroom_count"])
+            bathroom_count = int(request.form["bathroom_count"])
+            rent_price = float(request.form["rent_price"])
+            laundry = request.form["laundry"] == "true"
+            pet_friendly = request.form["pet_friendly"] == "true"
+            available = request.form["available"] == "true"
+
+            # Handle the image file
+            if "propertyImage" not in request.files:
+                return jsonify({"error": "Property image is required"}), 400
+
+            property_image = request.files["propertyImage"]
 
             detail_instance = Details(
                 bedroom_count=bedroom_count,
@@ -414,8 +476,8 @@ def landlord_handler():
                 property_owner=owner,
                 available=available,
                 rent_price=rent_price,
-                images=images,
-                introduction=intoduction,
+                image=property_image,
+                introduction=introduction,
                 details=detail_instance,
             )
             group_instance = Group(
@@ -461,6 +523,7 @@ def landlord_handler():
 
     return jsonify({"error": "Method Not Allowed"}), 405
 
+
 @app.route("/get-room", methods=["GET", "OPTIONS", "POST"])
 def room_handler():
     """
@@ -487,7 +550,7 @@ def room_handler():
         try:
             room_object = None
             users_involved = [sender, receiver]
-            room_instance = Rooms(room_users = users_involved, messages = [])
+            room_instance = Rooms(room_users=users_involved, messages=[])
             for room in room_instance.retrieve_all_rooms():
                 if users_involved.sort() == room["room_users"].sort():
                     room_object = room
@@ -500,6 +563,7 @@ def room_handler():
 
         except RoomNotFoundException as e:
             return jsonify({"errortest": f"{e}"}), 400
+
 
 @app.route("/add-msg", methods=["OPTIONS", "POST"])
 def message_handler():
@@ -542,6 +606,7 @@ def message_handler():
             return jsonify(room_instance.to_dict()), 200
         except RoomNotFoundException as e:
             return jsonify({"errortest": f"{e}"}), 400
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8090)
