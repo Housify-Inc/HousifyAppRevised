@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import Slider from 'react-slick';
-import 'slick-carousel/slick/slick.css';
-import 'slick-carousel/slick/slick-theme.css';
-import ImageSlider from './Carousel';
 
 const Cards = () => {
   const [housingData, setHousingData] = useState([]);
@@ -48,16 +45,15 @@ const Cards = () => {
       </header>
       <div className='grid lg:grid-cols-3 gap-6'>
         {housingData.map((card, index) => (
-          <div key={index} className={`shadow-lg rounded-lg ${expandedCard === index ? 'bg-gray-100' : 'hover:bg-gray-100 text-slate-100'}`} onClick={() => handleCardClick(index)}>
+          <div key={index} className={`shadow-lg rounded-lg ${expandedCard === index ? 'bg-gray-100' : 'hover:bg-gray-100'}`} onClick={() => handleCardClick(index)}>
             <img className='rounded-t-lg' src={card.img} alt="" />
-            <div className='p-5 text-slate-100 hover:text-slate-700'>
+            <div className={`p-5 shadow-lg rounded-lg text-slate-100 ${expandedCard === index ? 'text-slate-700' : 'hover:text-slate-700'}`}>
               <h3 className='text-3x1 font-bold text-slate-700 mb-3'>{card.property_address}</h3>
-              {card.real_estate.introduction}
+              <h3 className={`text-3x1 font-bold mb-3`}>{card.real_estate.introduction}</h3>
               {expandedCard === index && (
                 <div className="expanded-view">
-                  <p>Owner: {card.property_owner}</p>
-                  <p>Bedrooms: {card.real_estate.bedroom_count}</p>
-                  <p>Bathrooms: {card.real_estate.bathroom_count}</p>
+                  <p>Bedrooms: {card.real_estate.details.bedroom_count}</p>
+                  <p>Bathrooms: {card.real_estate.details.bathroom_count}</p>
                   <p>Laundry: {card.real_estate.laundry ? 'Yes' : 'No'}</p>
                   <p>Pet Friendly: {card.real_estate.pet_friendly ? 'Yes' : 'No'}</p>
                   {/* Add more information as needed */}

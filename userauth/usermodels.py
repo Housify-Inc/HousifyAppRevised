@@ -3,7 +3,10 @@ from Exceptions import UnexpectedLogicException
 from Exceptions import HouseNotFoundException
 from pymongo import MongoClient
 from housemodels import House, Group, RealEstate, Details
+from gridfs import GridFS, GridFSBucket
 import certifi
+from bson import ObjectId
+
 ca = certifi.where()
 
 
@@ -11,7 +14,7 @@ class User:
     """
     Class for representing a user in the system.
     """
-    def __init__(self, username=None, password=None, first_name=None, last_name=None, phone_number=None, payment_info=None, user_type=None, pending_requests=None, housing_group=None, saved_properties=None, upcoming_tours=None, my_properties=None):
+    def __init__(self, username=None, password=None, first_name=None, last_name=None, phone_number=None, payment_info=None, user_type=None, pending_requests=None, housing_group=None, saved_properties=None, upcoming_tours=None, my_properties=None, profile_picture=None):
         self.username = username
         self.password = password
         self.first_name = first_name
@@ -19,30 +22,33 @@ class User:
         self.phone_number = phone_number
         self.payment_info = payment_info
         self.user_type = user_type
-        self.upcoming_tours = upcoming_tours # Both landlords and tenants can have this, so this is uniform across both data.
-        #TENANT RELATED DATA
-        self.pending_requests = pending_requests #stores requestID's sent over by House Clients
+        self.profile_picture = profile_picture
+        self.upcoming_tours = upcoming_tours  # Both landlords and tenants can have this, so this is uniform across both data.
+        # TENANT RELATED DATA
+        self.pending_requests = (
+            pending_requests  # stores requestID's sent over by House Clients
+        )
         self.housing_group = housing_group
         self.saved_properties = saved_properties
-        #LANDLORD RELATED DATA
+        # LANDLORD RELATED DATA
         self.my_properties = my_properties
-
 
     # @classmethod
     def from_dict(self, user_dict):
         return self.__class__(
-            username=user_dict.get('username'),
-            password=user_dict.get('password'),
-            payment_info=user_dict.get('payment_info'),
-            first_name=user_dict.get('first_name'),
-            last_name=user_dict.get('last_name'),
-            phone_number=user_dict.get('phone_number'),
-            user_type=user_dict.get('user_type'),
-            pending_requests=user_dict.get('pending_requests', []),
-            housing_group=user_dict.get('housing_group'),
-            saved_properties=user_dict.get('saved_properties', []),
-            upcoming_tours=user_dict.get('upcoming_tours', []),
-            my_properties=user_dict.get('my_properties', [])
+            username=user_dict.get("username"),
+            password=user_dict.get("password"),
+            payment_info=user_dict.get("payment_info"),
+            first_name=user_dict.get("first_name"),
+            last_name=user_dict.get("last_name"),
+            phone_number=user_dict.get("phone_number"),
+            user_type=user_dict.get("user_type"),
+            profile_picture=user_dict.get("profile_picture"),
+            pending_requests=user_dict.get("pending_requests", []),
+            housing_group=user_dict.get("housing_group"),
+            saved_properties=user_dict.get("saved_properties", []),
+            upcoming_tours=user_dict.get("upcoming_tours", []),
+            my_properties=user_dict.get("my_properties", []),
         )
 
     def to_dict(self):
@@ -60,9 +66,10 @@ class User:
             "saved_properties": self.saved_properties,
             "upcoming_tours": self.upcoming_tours,
             "my_properties": self.my_properties,
+            "profile_picture": str(self.profile_picture),
         }
         return user_dict
-    
+
     def print_user_info(self):
         print("User Information:")
         print(f"Username: {self.username}")
@@ -74,11 +81,11 @@ class User:
         print(f"Saved Properties: {self.saved_properties}")
         print(f"Upcoming Tours: {self.upcoming_tours}")
         print(f"My Properties: {self.my_properties}")
-    
+
     # @classmethod
-    def retrieve_user_info(self, username): #access database for complete user info
+    def retrieve_user_info(self, username):  # access database for complete user info
         connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
-        client = MongoClient(connection_string, tlsCaFile=ca) 
+        client = MongoClient(connection_string, tlsCaFile=ca)
         db = client.UserInformation
         collection = db.UserProfiles
 
@@ -86,22 +93,22 @@ class User:
 
         if not user:
             raise UserNotFoundException(f"No user found with the username: {username}")
-        
+
         client.close()
 
         return self.from_dict(user)
-    
+
     # @classmethod
-    def get_password(self, username=None): #access database for password
+    def get_password(self, username=None):  # access database for password
         if username is None:
             self.password = self.retrieve_user_info(self.username).password
             return self.password
         else:
             self.password = self.retrieve_user_info(username).password
             return self.password
-    
+
     # @classmethod
-    def get_payment_info(self, username=None): #access database for password
+    def get_payment_info(self, username=None):  # access database for password
         if username is None:
             self.payment_info = self.retrieve_user_info(self.username).payment_info
             return self.payment_info
@@ -109,36 +116,43 @@ class User:
             self.payment_info = self.retrieve_user_info(username).payment_info
             return self.payment_info
 
-    # @classmethod    
-    def get_user_type(self, username=None): #access database for user type
+    # @classmethod
+    def get_user_type(self, username=None):  # access database for user type
         if username is None:
             self.user_type = self.retrieve_user_info(self.username).user_type
             return self.user_type
         else:
             self.user_type = self.retrieve_user_info(username).user_type
-            return self.user_type 
-    
+            return self.user_type
+
     # @classmethod
     def update_profile_password(self, new_password, username=None):
         connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
-        client = MongoClient(connection_string, tlsCaFile=ca) 
+        client = MongoClient(connection_string, tlsCaFile=ca)
         db = client.UserInformation
         collection = db.UserProfiles
         if username is None:
-            collection.update_one({"username": self.username}, {"$set": {"password": new_password}})
+            collection.update_one(
+                {"username": self.username}, {"$set": {"password": new_password}}
+            )
         else:
-            collection.update_one({"username": username}, {"$set": {"password": new_password}})
-        
+            collection.update_one(
+                {"username": username}, {"$set": {"password": new_password}}
+            )
+
         client.close()
 
     # @classmethod
     def update_profile_payment_info(self, new_payment_info, username=None):
         connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
-        client = MongoClient(connection_string, tlsCaFile=ca) 
+        client = MongoClient(connection_string, tlsCaFile=ca)
         db = client.UserInformation
         collection = db.UserProfiles
         if username is None:
-            collection.update_one({"username": self.username}, {"$set": {"payment_info": new_payment_info}})
+            collection.update_one(
+                {"username": self.username},
+                {"$set": {"payment_info": new_payment_info}},
+            )
         else:
             collection.update_one({"username": username}, {"$set": {"payment_info": new_payment_info}})
         
@@ -146,18 +160,32 @@ class User:
     
     def add_user_info(self): #inserts user info into database
         connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
-        client = MongoClient(connection_string, tlsCaFile=ca) 
+        client = MongoClient(connection_string, tlsCaFile=ca)
         db = client.UserInformation
         collection = db.UserProfiles
+
+        # add image to GridFS bucket
+        fs_bucket = GridFSBucket(db)
+
+        file_id = fs_bucket.upload_from_stream(
+            self.profile_picture.filename,
+            self.profile_picture,
+            metadata={
+                "contentType": self.profile_picture.content_type,
+                "user": self.username,
+            },
+        )
+
+        self.profile_picture = file_id
 
         user_data = self.to_dict()
         collection.insert_one(user_data)
 
         client.close()
-            
-    def delete_user(self): #use for when deleting a user from Housify's Services 
+
+    def delete_user(self):  # use for when deleting a user from Housify's Services
         connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
-        client = MongoClient(connection_string, tlsCaFile=ca) 
+        client = MongoClient(connection_string, tlsCaFile=ca)
         db = client.UserInformation
         collection = db.UserProfiles
 
@@ -167,7 +195,7 @@ class User:
 
     def check_new_user(self):
         connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
-        client = MongoClient(connection_string, tlsCaFile=ca) 
+        client = MongoClient(connection_string, tlsCaFile=ca)
         db = client.UserInformation
         collection = db.UserProfiles
 
@@ -183,7 +211,6 @@ class User:
         client = MongoClient(connection_string, tlsCaFile=ca) 
         db = client.UserInformation
         collection = db.UserProfiles
-
         # Convert the current user instance to a dictionary
         user_data = self.to_dict()
 
@@ -192,6 +219,20 @@ class User:
 
         client.close()
         return True
+    
+    def serve_up_image(self, image_id):
+        connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
+        client = MongoClient(connection_string, tlsCaFile=ca)
+        db = client.UserInformation
+
+        # Retrieve the image file from GridFS
+        fs_bucket = GridFSBucket(db)
+        object_id = ObjectId(image_id)
+        grid_out = fs_bucket.open_download_stream(object_id)
+        contents = grid_out.read()
+
+        # Send the image data back to the server
+        return grid_out, contents
 
     def accept_request(self, request_id): #joins new user to housing group
     # Parse the request

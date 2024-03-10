@@ -5,6 +5,8 @@ import { useState } from 'react'
 import Groups from '../Components/Groups'
 import Cards from "../Components/Properties"
 import Tours from '../Components/MyTours'
+import { getResponseData } from '../ResponseHandler'
+
 const user = {
   name: 'Tom Cook',
   email: 'tom@example.com',
@@ -28,7 +30,7 @@ function classNames(...classes) {
 }
 
 export default function LandLoardDashboard() {
-
+  const responseData = getResponseData();
   const [navigation, setNavigation] = useState(initialNavigation);
   const handleNavigationClick = (clickedIndex) => {
     const updatedNavigation = navigation.map((item, index) => ({
@@ -108,7 +110,7 @@ export default function LandLoardDashboard() {
                           <Menu.Button className="relative flex max-w-xs items-center rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                             <span className="absolute -inset-1.5" />
                             <span className="sr-only">Open user menu</span>
-                            <img className="h-8 w-8 rounded-full" src={user.imageUrl} alt="" />
+                            <img className="h-8 w-8 rounded-full" src={responseData.profile_picture} alt="" />
                           </Menu.Button>
                         </div>
                         <Transition
@@ -128,7 +130,7 @@ export default function LandLoardDashboard() {
                                     href={item.href}
                                     className={classNames(
                                       active ? 'bg-gray-100' : '',
-                                      'block px-4 text-sm text-gray-700'
+                                      'block px-4 py-2 text-sm text-gray-700'
                                     )}
                                   >
                                     {item.name}
@@ -208,12 +210,12 @@ export default function LandLoardDashboard() {
             </>
           )}
         </Disclosure>
-        <main className="-mt-6">
-            <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                {getContentComponent()}
-            </div>
+        <main>
+          <div className="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">{
+              /* Your content */
+              getContentComponent()
+            }</div>
         </main>
-
 
       </div>
     </>

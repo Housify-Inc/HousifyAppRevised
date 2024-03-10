@@ -1,12 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Form from 'react-bootstrap/Form';
 import data from './data';
 import PropertyForm from './PropertyForm';
+import { getResponseData } from '../ResponseHandler';
 
 const MyProperties = () => {
   // State to control the visibility of the form
   const [showForm, setShowForm] = useState(false);
+  const responseData = getResponseData();
+  const [expandedCard, setExpandedCard] = useState(null);
+  const [propertiesData, setPropertiesData] = useState([]);
+  useEffect(() => {
+    const handleListings = async () => {
+      const propertiesUrl = `http://localhost:8090/landlord_properties?username=${responseData.username}`;
+      try {
+        const response = await fetch(propertiesUrl, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        if (!response.ok) {
+          throw new Error('Failed to fetch housing data');
+        }
+        const properties = await response.json();
+        setPropertiesData(properties);
+        console.log("Properties for this Landlord", propertiesData);
+      } catch (error) {
+        console.error('Error fetching housing data:', error);
+      }
+    };
 
+    handleListings();
+  }, []);
   // Function to toggle the visibility of the form
   const toggleForm = () => {
     setShowForm(!showForm);
@@ -17,6 +43,14 @@ const MyProperties = () => {
     event.preventDefault();
     // Add your form submission logic here
     console.log('Form submitted!');
+  };
+
+  const handleCardClick = (index) => {
+    if (expandedCard === index) {
+      setExpandedCard(null); // Collapse the card if it's already expanded
+    } else {
+      setExpandedCard(index); // Expand the clicked card
+    }
   };
 
   return (
@@ -45,16 +79,25 @@ const MyProperties = () => {
 
       {/* Display property cards */}
       <div className='grid lg:grid-cols-3 gap-6'>
-        {data.map(card => (
-          <div className='shadow-lg rounded-lg hover:bg-gray-100' key={card.id}>
-            <img className='rounded-t-lg' src={card.img} alt=""/>
-            <div className='p-5'>
-              <h3 className='text-3x1 font-bold text-slate-400 mb-3'>{card.title}</h3>
-              <p className='text-lg font-normal text-gray-400'>{card.text}</p>
+        {propertiesData.map((card, index) => (
+          <div key={index} className={`shadow-lg rounded-lg ${expandedCard === index ? 'bg-gray-100' : 'hover:bg-gray-100'}`} onClick={() => handleCardClick(index)}>
+            <img className='rounded-t-lg' src={card.img} alt="" />
+            <div className={`p-5 shadow-lg rounded-lg text-slate-100 ${expandedCard === index ? 'text-slate-700' : 'hover:text-slate-700'}`}>
+              <h3 className='text-3x1 font-bold text-slate-700 mb-3'>{card.property_address}</h3>
+              <h3 className={`text-3x1 font-bold mb-3`}>{card.real_estate.introduction}</h3>
+              {expandedCard === index && (
+                <div className="expanded-view">
+                  <p>Bedrooms: {card.real_estate.details.bedroom_count}</p>
+                  <p>Bathrooms: {card.real_estate.details.bathroom_count}</p>
+                  <p>Laundry: {card.real_estate.laundry ? 'Yes' : 'No'}</p>
+                  <p>Pet Friendly: {card.real_estate.pet_friendly ? 'Yes' : 'No'}</p>
+                  {/* Add more information as needed */}
+                </div>
+              )}
             </div>
-          </div>  
+          </div>
         ))}
-      </div>  
+      </div>
     </main>
   );
 };
