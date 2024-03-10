@@ -178,18 +178,74 @@ class User:
         # Return True if the username doesn't exist, False otherwise
         return valid_user is None
     
+    def update_user_info(self): #update's user's information if changes are made locally (e.g. when requests are being added or removed)
+        connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
+        client = MongoClient(connection_string, tlsCaFile=ca) 
+        db = client.UserInformation
+        collection = db.UserProfiles
 
-    # @classmethod
-# def retrieve_landlord_property_info(landlord_username):
-#     # retrieve the user info first
-#     user_instance = User.retrieve_user_info(landlord_username)
-#     # Check that the user type is landlord
-#     if user_instance.user_type!= "landlord":
-#         raise UserNotFoundException(f"No landlord found with the username: {landlord_username}")
-#     # Retrieve the landlord's property info
-#     return user_instance.my_properties
+        # Convert the current user instance to a dictionary
+        user_data = self.to_dict()
 
-    # @classmethod
+        # Update the user information in the database
+        collection.update_one({"username": self.username}, {"$set": user_data})
+
+        client.close()
+        return True
+
+    def accept_request(self, request_id): #joins new user to housing group
+    # Parse the request
+        property_address, username = request_id.split("-")
+        house_instance = House().retrieve_housing_info(property_address)
+        if username is not self.username: 
+            raise UnexpectedLogicException(f"expected username of {self.username}, but got {username}")
+        if house_instance is None:
+            raise HouseNotFoundException(f"property {property_address} not found")
+        self.pending_requests.remove(request_id)
+        # Updating the user_instance with the new information
+        self.update_user_info()
+        house_instance.group["all_housemates"].append(self.username)
+        # Updating the house_instance with the new information
+        house_instance.update_housing_info()
+
+    def add_tour(self, property_address): 
+
+        '''
+        Call this method from the tenant view. Will append to the landlord upcoming_tours field.
+
+        User Notes:
+        1. Landlord - Sees the contact information of tenant (First Name, Last Name, username (email), phone number, Address of Property requested)
+        2. Tenant - Sees the contact information of landlord (First Name, Last Name, username (email), phone number, Address of Property requested)
+        '''
+        # retrieve property owner info from house
+        house_instance = House().retrieve_housing_info(property_address)
+        if house_instance is None:
+            raise UnexpectedLogicException(f"Weird error occurred when request prompt initiated: Missing House")
+        
+        if self.user_type != "tenant":
+            raise UnexpectedLogicException(f"Attempted to retrieve via landlord account for username: {self.username}")
+        # add tour to list of tours
+        
+        landlord_instance = User().retrieve_user_info(house_instance.property_owner)
+        landlord_output = {
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "username": self.username,
+            "phone_number": self.phone_number,
+            "tour_address": property_address
+        }
+        tenant_output = {
+            "first_name": landlord_instance.first_name,
+            "last_name": landlord_instance.last_name,
+            "username": landlord_instance.username,
+            "phone_number": landlord_instance.phone_number,
+            "tour_address": property_address
+        }
+        landlord_instance.upcoming_tours.append(landlord_output)
+        self.upcoming_tours.append(tenant_output)
+        landlord_instance.update_user_info()
+        self.update_user_info()
+
 def retrieve_landlord_property_info(username):
     # Retrieve the user information
     user_info = User().retrieve_user_info(username)
@@ -197,7 +253,6 @@ def retrieve_landlord_property_info(username):
 
     # Check if the user is a landlord
     if user_info.user_type == "landlord":
-        print("ENTERED HERE FOR NAIRDELIVERS")
         # Get the list of property addresses owned by the landlord
         landlord_properties = user_info.my_properties
 
