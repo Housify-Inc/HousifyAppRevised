@@ -1,7 +1,6 @@
 from Exceptions import UserNotFoundException, HouseNotFoundException, InvalidUserTypeException, UserAlreadyExistsException
 from Exceptions import UnexpectedLogicException
 from pymongo import MongoClient
-from usermodels import User
 import certifi
 
 ca = certifi.where()
@@ -42,12 +41,48 @@ class House:
 
     @classmethod
     def from_dict(cls, house_dict):
+        # Extract group and real_estate sub-dictionaries
+        group_dict = house_dict.get('group', {})
+        real_estate_dict = house_dict.get('real_estate', {})
+        
+        # Extract details sub-dictionary from real_estate_dict
+        details_dict = real_estate_dict.get('details', {})
+        
+        # Instantiate Details object from details_dict
+        details = Details(
+            bedroom_count=details_dict.get('bedroom_count'),
+            bathroom_count=details_dict.get('bathroom_count'),
+            appliances=details_dict.get('appliances'),
+            laundry=details_dict.get('laundry'),
+            pet_friendly=details_dict.get('pet_friendly')
+        )
+        
+        # Instantiate RealEstate object, including the Details object
+        real_estate = RealEstate(
+            property_address=real_estate_dict.get('property_address'),
+            property_owner=real_estate_dict.get('property_owner'),
+            available=real_estate_dict.get('available'),
+            rent_price=real_estate_dict.get('rent_price'),
+            images=real_estate_dict.get('images'),
+            introduction=real_estate_dict.get('introduction'),
+            details=details  # Pass the instantiated Details object
+        )
+        
+        # Instantiate Group object
+        group = Group(
+            property_address=group_dict.get('property_address'),
+            property_owner=group_dict.get('property_owner'),
+            all_housemates=group_dict.get('all_housemates')
+        )
+        
+        # Return a new House instance with all nested objects
         return cls(
             property_address=house_dict.get('property_address'),
             property_owner=house_dict.get('property_owner'),
-            group=Group(**house_dict.get('group')),
-            real_estate=RealEstate(**house_dict.get('real_estate'))
+            group=group,
+            real_estate=real_estate
         )
+
 
     def to_dict(self):
         return {
@@ -66,11 +101,11 @@ class House:
                 "images": self.real_estate.images,
                 "introduction": self.real_estate.introduction,
                 "details": {
-                    "bedroom_count": self.real_estate.details["bedroom_count"],
-                    "bathroom_count": self.real_estate.details["bathroom_count"],
-                    "appliances": self.real_estate.details["appliances"],
-                    "laundry": self.real_estate.details["laundry"],
-                    "pet_friendly": self.real_estate.details["pet_friendly"]
+                    "bedroom_count": self.real_estate.details.bedroom_count,
+                    "bathroom_count": self.real_estate.details.bathroom_count,
+                    "appliances": self.real_estate.details.appliances,
+                    "laundry": self.real_estate.details.laundry,
+                    "pet_friendly": self.real_estate.details.pet_friendly
                 }
             }
         }
@@ -88,6 +123,16 @@ class House:
         client.close()
 
         return self.from_dict(house)
+
+    def add_house_info(self): #inserts user info into database
+        connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@houseinfo.5nbfw82.mongodb.net/"
+        client = MongoClient(connection_string, tlsCaFile=ca) 
+        db = client.HousesDatabase
+        collection = db.HouseInfo
+        print('got here')
+        house_data = self.to_dict()
+        collection.insert_one(house_data)
+        client.close()
 
     def print_housing_info(self):
         print(f"Groups: {self.group.all_housemates}")
@@ -138,7 +183,7 @@ class House:
     # accept_request_to_group(property_address): Tenant can accept request to join landlord's housing group
     ########################################################################
     
-    def request_to_group(self, tenant_username): #Requests user on behalf of house to join group
+    def generate_request_id(self, tenant_username): #Requests user on behalf of house to join group
         # retrieve user's info
         user_instance = User.retrieve_user_info(tenant_username)
         # Check that the user type is landlord or if it is already in group (invalid cases to request)
@@ -148,10 +193,6 @@ class House:
             raise UserAlreadyExistsException(f"User {tenant_username} already exists in {self.property_address}")
         # Create requestID
         request_id = f"{tenant_username}-{self.property_address}"
-        # Add request to user's pending_requests field
-        user_instance.pending_requests.append(request_id)
-        # update user's information in database
-        user_instance.update_user_info()
         
         return request_id
     

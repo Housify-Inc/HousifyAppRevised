@@ -1,6 +1,7 @@
 from Exceptions import UserNotFoundException
 from Exceptions import UnexpectedLogicException
 from Exceptions import HouseNotFoundException
+from Exceptions import InvalidUserTypeException, UserAlreadyExistsException
 from pymongo import MongoClient
 from housemodels import House, Group, RealEstate, Details
 from gridfs import GridFS, GridFSBucket
@@ -233,6 +234,52 @@ class User:
 
         # Send the image data back to the server
         return grid_out, contents
+    
+    def add_property(self, property_info):
+        """
+        Add a property to the user's list of properties and update the database.
+        Parameters:
+            property_info (dict): Information about the property to add.
+        Raises:
+            UnexpectedLogicException: If the user type is not recognized.
+            UserNotFoundException: If the user is not found in the database.
+        """
+        # Check user type to determine where to add the property
+        if self.user_type == "landlord":
+            # Append property to my_properties
+            self.my_properties.append(property_info)
+            # Update database
+            self.update_user_properties()
+        elif self.user_type == "tenant":
+            # As a tenant, cannot directly add properties
+            raise UnexpectedLogicException("Tenants cannot directly add properties.")
+        else:
+            # If user type is not recognized, raise exception
+            raise UnexpectedLogicException("User type not recognized.")
+    
+    def update_user_properties(self):
+        """
+        Update the user's properties in the database.
+        """
+        connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@userpasswords.pxdm1kt.mongodb.net/"
+        client = MongoClient(connection_string, tlsCAFile=ca)
+        db = client.UserInformation
+        collection = db.UserProfiles
+
+        # Update user document in the database with new properties
+        collection.update_one({"username": self.username}, {"$set": {"my_properties": self.my_properties}})
+
+        client.close()
+
+    def add_request_id(self, request_id): #continuation of generate_request_id() to store into data
+        
+        property_address, username = request_id.split("-")
+        user_instance = User().retrieve_user_info(username)
+
+        # Add request to user's pending_requests field
+        user_instance.pending_requests.append(request_id)
+        # update user's information in database
+        user_instance.update_user_info()
 
     def accept_request(self, request_id): #joins new user to housing group
     # Parse the request
