@@ -44,6 +44,8 @@ class Rooms:
 
         room_data = self.to_dict()
         self.collection.insert_one(room_data)
+        room_data["_id"] = str(room_data["_id"])
+        return(room_data)
 
     def retrieve_room_info(self, id=None):
         self.client = MongoClient(

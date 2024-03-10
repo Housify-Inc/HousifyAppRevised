@@ -550,14 +550,16 @@ def room_handler():
         try:
             room_object = None
             users_involved = [sender, receiver]
+            users_involved.sort()
             room_instance = Rooms(room_users=users_involved, messages=[])
             for room in room_instance.retrieve_all_rooms():
-                if users_involved.sort() == room["room_users"].sort():
+                room["room_users"].sort()
+                print(room["room_users"], users_involved)
+                if users_involved == room["room_users"]:
                     room_object = room
                     break
             if room_object is None:
-                room_instance.create_room()
-                return jsonify(room_instance), 201
+                return jsonify(room_instance.create_room()), 201
             # print(all_housemates_array)
             return jsonify(room_object), 200
 

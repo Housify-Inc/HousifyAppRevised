@@ -34,7 +34,7 @@ export const Chat = (props) => {
 
           const intervalId = setInterval(() => {
             handleRoom();
-          }, 3000); // Fetch data every 5 seconds (adjust as needed)
+          }, 5000); // Fetch data every 5 seconds (adjust as needed)
       };
 
       handleRoom();
