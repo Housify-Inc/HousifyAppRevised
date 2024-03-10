@@ -1,4 +1,4 @@
-import { addDoc, collection, onSnapshot, orderBy, query, serverTimestamp, where } from 'firebase/firestore';
+
 import React, { useEffect, useRef, useState } from "react";
 import { getResponseData } from "../ResponseHandler";
 import { auth, db } from '../firebase-config';
@@ -7,42 +7,89 @@ import { auth, db } from '../firebase-config';
 export const Chat = (props) => {
     const responseData = getResponseData();
 
-    const{room} = props;
-
+    const{receiver_email} = props;
+    const [room, setRoom] = useState([]);
     const [newMessage, setnewMessage] = useState("");
     const [messages, setMessages] = useState([]);
 
+    console.log("Receiver Email: " + receiver_email + ", Sender Email: " + responseData.username)
 
-    const messagesRef = collection(db, 'messages');
 
+    useEffect( () =>{
+      const handleRoom = async () =>{
+          // e.preventDefault();
+          const roomUrl = `http://localhost:8090/get-room?sender=${responseData.username}&receiver=${receiver_email}`;
+          
+          const response = await fetch(roomUrl, {
+              method: 'GET',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+          });
+          const roomData = await response.json();
+          setRoom(roomData);
+          
+          console.log(roomData._id);
+          setMessages(roomData.messages)
 
-    useEffect(() => {
-        const queryMessages = query(messagesRef, where('room', '==', room), orderBy("createdAt"))
-        const unsubscribe = onSnapshot(queryMessages, (snapshot) => {
-            let messages = []
-            snapshot.forEach((doc) => {
-                messages.push({...doc.data(), id: doc.id})
-            });
-            setMessages(messages);
+          const intervalId = setInterval(() => {
+            handleRoom();
+          }, 3000); // Fetch data every 5 seconds (adjust as needed)
+      };
+
+      handleRoom();
+  }, []);
+    
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    if (newMessage === '') return;
+
+    try {
+        const addMessageUrl = 'http://localhost:8090/add-msg';
+
+        const response = await fetch(addMessageUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                room_id: room._id, // Assuming room._id is available in your state
+                text: newMessage,
+                timestamp: new Date().getTime(), // Replace this with your timestamp logic
+                sender: responseData.username,
+            }),
         });
 
-        return () => unsubscribe();
-    }, [])
+        const responseDataPost = await response.json();
 
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-        if (newMessage === '') return;
-
-        await addDoc(messagesRef, {
-            text: newMessage,
-            createdAt: serverTimestamp(),
-            user: responseData.first_name + ' ' + responseData.last_name,
-            room,
-        });
-
-        setnewMessage('');
-
+        if (response.ok) {
+            console.log('Message added successfully:', responseData.message);
+        } else {
+            console.error('Error adding message:', responseData.error);
+        }
+    } catch (error) {
+        console.error('Error adding message:', error.message);
     }
+
+    setnewMessage('');
+}
+
+
+
+    // const handleSubmit = async (event) => {
+    //     event.preventDefault();
+    //     if (newMessage === '') return;
+        
+    //     // await addDoc(messagesRef, {
+    //     //     text: newMessage,
+    //     //     createdAt: serverTimestamp(),
+    //     //     user: responseData.first_name + ' ' + responseData.last_name,
+    //     //     room,
+    //     // });
+
+    //     setnewMessage('');
+
+    // }
 
     const boxStyle = {
         width: '200px',
@@ -59,14 +106,14 @@ export const Chat = (props) => {
     <div style={{ fontFamily: 'Arial, sans-serif', textAlign: 'center', paddingTop: '20px' }}>
     <div>
       <h1 style={{ marginBottom: '20px', fontSize: '24px', fontWeight: 'bold' }}>
-        Person: {room}
+        Person: {receiver_email}
       </h1>
     </div>
 
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       {messages.map((message) => (
         <div key={message.id} style={{ marginBottom: '10px', maxWidth: '300px', textAlign: 'left' }}>
-          <b style={{ marginRight: '5px', fontSize: '16px' }}>{message.user}:</b>
+          <b style={{ marginRight: '5px', fontSize: '16px' }}>{message.sender}:</b>
           <span style={{ fontSize: '16px' }}>{message.text}</span>
         </div>
       ))}

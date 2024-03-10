@@ -311,16 +311,59 @@ def room_handler():
         try:
             room_object = None
             users_involved = [sender, receiver]
-            room_instance = Rooms(room_users = users_involved, messages = "")
+            room_instance = Rooms(room_users = users_involved, messages = [])
             for room in room_instance.retrieve_all_rooms():
                 if users_involved.sort() == room["room_users"].sort():
                     room_object = room
                     break
             if room_object is None:
-                return jsonify({"error" : "No room containing both users"}), 500
+                room_instance.create_room()
+                return jsonify(room_instance), 201
             # print(all_housemates_array)
             return jsonify(room_object), 200
 
+        except RoomNotFoundException as e:
+            return jsonify({"errortest": f"{e}"}), 400
+
+@app.route("/add-msg", methods=["OPTIONS", "POST"])
+def message_handler():
+    if request.method == "OPTIONS":
+        # Handle CORS preflight request
+        response = jsonify({"message": "CORS preflight request handled"})
+        response.headers["Access-Control-Allow-Origin"] = (
+            "*"  # Allow requests from any origin
+        )
+        response.headers["Access-Control-Allow-Methods"] = (
+            "GET, POST"  # Allow GET and POST methods
+        )
+        response.headers["Access-Control-Allow-Headers"] = (
+            "Content-Type"  # Allow Content-Type header
+        )
+        return response, 200
+
+    elif request.method == "POST":
+        try:
+            # extract request body
+            data = request.json
+
+            # extract relevant fields
+            room_id = data.get("room_id")
+            new_message_text = data.get("text")
+            new_message_timestamp = data.get("timestamp")
+            new_message_sender = data.get("sender")
+
+            # Create an instance of Messages
+            new_message = Messages(
+                text=new_message_text,
+                timestamp=new_message_timestamp,
+                sender=new_message_sender,
+            )
+
+            # Create an instance of Rooms
+            room_instance = Rooms(room_users=[], messages=[])
+            room_instance.add_message(room_id, new_message)
+
+            return jsonify(room_instance.to_dict()), 200
         except RoomNotFoundException as e:
             return jsonify({"errortest": f"{e}"}), 400
 
