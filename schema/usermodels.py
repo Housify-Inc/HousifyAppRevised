@@ -208,6 +208,43 @@ class User:
         # Updating the house_instance with the new information
         house_instance.update_housing_info()
 
+    def add_tour(self, property_address): 
+
+        '''
+        Call this method from the tenant view. Will append to the landlord upcoming_tours field.
+
+        User Notes:
+        1. Landlord - Sees the contact information of tenant (First Name, Last Name, username (email), phone number, Address of Property requested)
+        2. Tenant - Sees the contact information of landlord (First Name, Last Name, username (email), phone number, Address of Property requested)
+        '''
+        # retrieve property owner info from house
+        house_instance = House().retrieve_housing_info(property_address)
+        if house_instance is None:
+            raise UnexpectedLogicException(f"Weird error occurred when request prompt initiated: Missing House")
+        
+        if self.user_type != "tenant":
+            raise UnexpectedLogicException(f"Attempted to retrieve via landlord account for username: {self.username}")
+        # add tour to list of tours
+        
+        landlord_instance = User().retrieve_user_info(house_instance.property_owner)
+        landlord_output = {
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "username": self.username,
+            "phone_number": self.phone_number,
+            "tour_address": property_address
+        }
+        tenant_output = {
+            "first_name": landlord_instance.first_name,
+            "last_name": landlord_instance.last_name,
+            "username": landlord_instance.username,
+            "phone_number": landlord_instance.phone_number,
+            "tour_address": property_address
+        }
+        landlord_instance.upcoming_tours.append(landlord_output)
+        self.upcoming_tours.append(tenant_output)
+        landlord_instance.update_user_info()
+        self.update_user_info()
 
 def retrieve_landlord_property_info(username):
     # Retrieve the user information
@@ -216,7 +253,6 @@ def retrieve_landlord_property_info(username):
 
     # Check if the user is a landlord
     if user_info.user_type == "landlord":
-        print("ENTERED HERE FOR NAIRDELIVERS")
         # Get the list of property addresses owned by the landlord
         landlord_properties = user_info.my_properties
 

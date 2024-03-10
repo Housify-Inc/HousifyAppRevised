@@ -1,6 +1,7 @@
-from Exceptions import UserNotFoundException, HouseNotFoundException
+from Exceptions import UserNotFoundException, HouseNotFoundException, InvalidUserTypeException, UserAlreadyExistsException
 from Exceptions import UnexpectedLogicException
 from pymongo import MongoClient
+from usermodels import User
 import certifi
 
 ca = certifi.where()
@@ -109,7 +110,7 @@ class House:
         client.close()
 
         return available_listings_json
-        
+    
     @classmethod
     def update_housing_info(self):
         connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@houseinfo.5nbfw82.mongodb.net/"
