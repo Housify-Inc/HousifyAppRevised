@@ -184,14 +184,6 @@ class House:
     ########################################################################
     
     def generate_request_id(self, tenant_username): #Requests user on behalf of house to join group
-        # retrieve user's info
-        user_instance = User.retrieve_user_info(tenant_username)
-        # Check that the user type is landlord or if it is already in group (invalid cases to request)
-        if user_instance.user_type == "landlord":
-            raise InvalidUserTypeException(f"Invalid user type: {tenant_username}")
-        if tenant_username in self.group["all_housemates"]:
-            raise UserAlreadyExistsException(f"User {tenant_username} already exists in {self.property_address}")
-        # Create requestID
         request_id = f"{tenant_username}-{self.property_address}"
         
         return request_id
