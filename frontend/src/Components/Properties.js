@@ -7,9 +7,12 @@ import { getResponseData } from '../ResponseHandler';
 const MyProperties = () => {
   // State to control the visibility of the form
   const [showForm, setShowForm] = useState(false);
+  const [showEmailForm, setShowEmailForm] = useState(false);
   const responseData = getResponseData();
   const [expandedCard, setExpandedCard] = useState(null);
   const [propertiesData, setPropertiesData] = useState([]);
+  const [email, setEmail] = useState("");
+  const [curaddress, setAddress] = useState("");
   useEffect(() => {
     const handleListings = async () => {
       const propertiesUrl = `http://localhost:8090/landlord_properties?username=${responseData.username}`;
@@ -38,12 +41,45 @@ const MyProperties = () => {
     setShowForm(!showForm);
   };
 
-  // Function to handle form submission
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    // Add your form submission logic here
-    console.log('Form submitted!');
+  const toggleEmailForm = () => {
+    setShowEmailForm(!showEmailForm);
   };
+  // Function to handle form submission
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+  
+    // Get the current card's address
+    const currentCard = propertiesData[expandedCard];
+    const currentCardAddress = currentCard.property_address;
+  
+    // Form data with email and property address
+    const formData = {
+      email: email,
+      property_address: currentCardAddress,
+      property_owner: responseData.username,
+    };
+
+    try {
+      console.log(formData);
+      const response = await fetch('http://localhost:8090/group-request', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+  
+      if (response.ok) {
+        console.log("Request sent successfully");
+      } else {
+        const errorMessage = await response.text();
+        console.error('Request failed:', errorMessage);
+      }
+    } catch (error) {
+      console.error('Request failed:', error);
+    }
+  };
+  
 
   const handleCardClick = (index) => {
     if (expandedCard === index) {
@@ -92,6 +128,22 @@ const MyProperties = () => {
                   <p>Laundry: {card.real_estate.laundry ? 'Yes' : 'No'}</p>
                   <p>Pet Friendly: {card.real_estate.pet_friendly ? 'Yes' : 'No'}</p>
                   {/* Add more information as needed */}
+                    <div onClick={(e) => e.stopPropagation()}>
+                      <Form onSubmit={handleSubmit}>
+                        <Form.Group controlId="email">
+                        <Form.Label>Email Address:</Form.Label>
+                        <Form.Control 
+                            type="email" 
+                            placeholder="Enter email"
+                            value={email} // Set the value of the input field to the email state
+                            onChange={(e) => setEmail(e.target.value)} // Update the email state when the user types
+                          />
+                        </Form.Group>
+                        <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                          Submit
+                        </button>
+                      </Form>
+                  </div>
                 </div>
               )}
             </div>

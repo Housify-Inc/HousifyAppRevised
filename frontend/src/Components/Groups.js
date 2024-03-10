@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faComment, faMoneyBill } from '@fortawesome/free-solid-svg-icons';
 import Messenger from './Messenger';
 import Payment from './payment';
+import PendingRequests from './GroupRequests';
 import { getResponseData } from '../ResponseHandler';
 
 const UserTable = () => {
@@ -57,6 +58,7 @@ const UserTable = () => {
             <div className="max-w-98 px-10">
                 <div className="mb-4">
                     <h1 className="text-4xl font-bold text-slate-100">You are not in any Housing Groups</h1>
+                    <PendingRequests/>
                 </div>
             </div>
         </div>

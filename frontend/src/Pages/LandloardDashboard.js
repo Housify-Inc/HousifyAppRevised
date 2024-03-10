@@ -2,7 +2,7 @@ import { Fragment } from 'react'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { useState } from 'react'
-import Groups from '../Components/Groups'
+import Tenants from '../Components/MyTenants'
 import Cards from "../Components/Properties"
 import Tours from '../Components/MyTours'
 import { getResponseData } from '../ResponseHandler'
@@ -48,7 +48,7 @@ export default function LandLoardDashboard() {
       case 'My Properties':
         return <Cards />;
       case 'My Tenants':
-        return <Groups />;
+        return <Tenants />;
       case 'My Tours':
         return <Tours />;
       // Add cases for other navigation items if needed
