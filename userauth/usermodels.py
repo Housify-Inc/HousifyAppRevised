@@ -272,29 +272,53 @@ class User:
         client.close()
 
     def add_request_id(self, request_id): #continuation of generate_request_id() to store into data
-        
-        property_address, username = request_id.split("-")
+        # print(f"attempting to print request_id: {request_id}")
+        username, property_address = request_id.split("-")
         user_instance = User().retrieve_user_info(username)
-
+        # print(f"printing {user_instance.username}'s info.")
         # Add request to user's pending_requests field
-        user_instance.pending_requests.append(request_id)
-        # update user's information in database
+        if request_id not in user_instance.pending_requests: 
+            user_instance.pending_requests.append(request_id)
+        # print(f"new print of {self.username}")
+        # user_instance.print_user_info()
+        # # update user's information in database
         user_instance.update_user_info()
+        #FOR DEBUGGING PURPOSES
+        # user_instance.retrieve_user_info(self.username)
+        # user_instance.print_user_info()
+
 
     def accept_request(self, request_id): #joins new user to housing group
     # Parse the request
-        property_address, username = request_id.split("-")
+        print(f"entering accept request for {self.username}")
+        username, property_address = request_id.split("-")
+        print(username, self.username)
+        print(property_address)
         house_instance = House().retrieve_housing_info(property_address)
-        if username is not self.username: 
+        if username != self.username: 
             raise UnexpectedLogicException(f"expected username of {self.username}, but got {username}")
         if house_instance is None:
             raise HouseNotFoundException(f"property {property_address} not found")
+        print("HERE!")
+        user_instance = User().retrieve_user_info(username)
+        user_instance.print_user_info()
+        if request_id in user_instance.pending_requests:
+            user_instance.pending_requests.remove(request_id)
+        
+        print(f"removed {request_id} from {user_instance.username}")
+        # Updating the user_instance with the new information
+        user_instance.housing_group = property_address;
+        user_instance.update_user_info()
+        house_instance.group.all_housemates.append(username)
+        house_instance.print_housing_info()
+        # Updating the house_instance with the new information
+        print("made changes to house instance")
+        house_instance.update_housing_info()
+
+    def reject_request(self, request_id): #joins new user to housing group
         self.pending_requests.remove(request_id)
         # Updating the user_instance with the new information
         self.update_user_info()
-        house_instance.group["all_housemates"].append(self.username)
-        # Updating the house_instance with the new information
-        house_instance.update_housing_info()
 
     def add_tour(self, property_address): 
 
@@ -309,17 +333,20 @@ class User:
         house_instance = House().retrieve_housing_info(property_address)
         if house_instance is None:
             raise UnexpectedLogicException(f"Weird error occurred when request prompt initiated: Missing House")
-        
-        if self.user_type != "tenant":
-            raise UnexpectedLogicException(f"Attempted to retrieve via landlord account for username: {self.username}")
+            
+        # if self.user_type != "tenant":
+        #     print("tenant error")
+        #     raise UnexpectedLogicException(f"Attempted to retrieve via landlord account for username: {self.username}")
+            
         # add tour to list of tours
         
         landlord_instance = User().retrieve_user_info(house_instance.property_owner)
+        user_instance = User().retrieve_user_info(self.username)
         landlord_output = {
-            "first_name": self.first_name,
-            "last_name": self.last_name,
-            "username": self.username,
-            "phone_number": self.phone_number,
+            "first_name": user_instance.first_name,
+            "last_name": user_instance.last_name,
+            "username": user_instance.username,
+            "phone_number": user_instance.phone_number,
             "tour_address": property_address
         }
         tenant_output = {
@@ -330,9 +357,9 @@ class User:
             "tour_address": property_address
         }
         landlord_instance.upcoming_tours.append(landlord_output)
-        self.upcoming_tours.append(tenant_output)
+        user_instance.upcoming_tours.append(tenant_output)
         landlord_instance.update_user_info()
-        self.update_user_info()
+        user_instance.update_user_info()
 
 def retrieve_landlord_property_info(username):
     # Retrieve the user information

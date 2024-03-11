@@ -214,7 +214,6 @@ class House:
 
         return available_listings_json
 
-    @classmethod
     def update_housing_info(self):
         connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@houseinfo.5nbfw82.mongodb.net/"
         client = MongoClient(connection_string, tlsCaFile=ca)
@@ -251,5 +250,5 @@ class House:
         self, tenant_username
     ):  # Requests user on behalf of house to join group
         request_id = f"{tenant_username}-{self.property_address}"
-
+        print(f"PRINTING REQUEST ID AT GENERATE: {request_id}")
         return request_id

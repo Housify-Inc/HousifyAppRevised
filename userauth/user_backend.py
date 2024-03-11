@@ -407,18 +407,48 @@ def request_handler():
         return response, 200
     elif request.method == "POST":
         data = request.json
-        username = data.get("email")
         address = data.get("property_address")
+        username = data.get("email")
         try:
             house_instance = House(property_address=address)
-            house_instance.request_to_group(username)
-            house_instance.print_housing_info()
-            return jsonify(house_instance.to_dict()), 201
-
+            requestid = house_instance.generate_request_id(username)
+            user_instance = User(username=username)
+            user_instance.add_request_id(requestid)
+            return jsonify(user_instance.to_dict()), 201
         except Exception as e:
             return jsonify({"error": str(e)}), 400
-    return jsonify({"error": "Method Not Allowed"}), 405
 
+@app.route("/accept-request", methods=["GET", "POST", "OPTIONS"])
+def accept_handler():
+    if request.method == "OPTIONS":
+        # Handle CORS preflight request
+        response = jsonify({"message": "CORS preflight request handled"})
+        response.headers["Access-Control-Allow-Origin"] = (
+            "*"  # Allow requests from any origin
+        )
+        response.headers["Access-Control-Allow-Methods"] = (
+            "GET, POST"  # Allow GET and POST methods
+        )
+        response.headers["Access-Control-Allow-Headers"] = (
+            "Content-Type"  # Allow Content-Type header
+        )
+        return response, 200
+
+    elif request.method == "POST":
+        try:
+            data = request.json
+            request_str = data["request"]  # Assuming the request is sent as a string# This will print the received request
+            username, property_address = request_str.split("-")
+            # Now you can use the request as needed
+            # For demonstration, I'm just printing the request here
+            user_instance = User(username=username)
+            print(request_str)
+            user_instance.accept_request(request_str)
+            print("Request accepted:", request_str)
+
+            return jsonify({"message": "Request accepted successfully"}), 200
+        except Exception as e:
+            return jsonify({"error": str(e)}), 400
 
 @app.route("/landlord-home", methods=["GET", "POST", "OPTIONS"])
 def landlord_handler():
@@ -559,6 +589,7 @@ def room_handler():
                     room_object = room
                     break
             if room_object is None:
+                # room_instance.create_room()
                 return jsonify(room_instance.create_room()), 201
             # print(all_housemates_array)
             return jsonify(room_object), 200
@@ -566,7 +597,33 @@ def room_handler():
         except RoomNotFoundException as e:
             return jsonify({"errortest": f"{e}"}), 400
 
+@app.route("/handle-tours", methods=["OPTIONS", "POST"])
+def tours_handler():
+    if request.method == "OPTIONS":
+        # Handle CORS preflight request
+        response = jsonify({"message": "CORS preflight request handled"})
+        response.headers["Access-Control-Allow-Origin"] = (
+            "*"  # Allow requests from any origin
+        )
+        response.headers["Access-Control-Allow-Methods"] = (
+            "GET, POST"  # Allow GET and POST methods
+        )
+        response.headers["Access-Control-Allow-Headers"] = (
+            "Content-Type"  # Allow Content-Type header
+        )
+        return response, 200
 
+    elif request.method == "POST":
+        try:
+            data = request.json
+            username = data.get("username")
+            address = data.get("property")
+            user_instance = User(username=username)
+            return jsonify(user_instance.add_tour(address)), 200
+        except Exception as e:
+            return jsonify({"error": str(e)}), 400
+    return jsonify({"error": "Method Not Allowed"}), 405
+    
 @app.route("/add-msg", methods=["OPTIONS", "POST"])
 def message_handler():
     if request.method == "OPTIONS":
