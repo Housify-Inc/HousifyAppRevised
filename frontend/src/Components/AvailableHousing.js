@@ -20,13 +20,11 @@ const Cards = () => {
         const housingData = await response.json();
         for (let i = 0; i < housingData.length; i++) {
           const house = housingData[i];
-          console.log(house.real_estate.image);
           try {
               const imageResponse = await fetch(`http://localhost:8090/property-image/${house.real_estate.image}`);
               if (imageResponse.ok) {
                   const blob = await imageResponse.blob();
                   const imageUrl = URL.createObjectURL(blob);
-                  console.log(imageUrl);
                   house.real_estate.image = imageUrl;
               } else {
                   console.error(`Failed to fetch image for house ${house.property_address}:`, imageResponse.status);
@@ -54,7 +52,6 @@ const Cards = () => {
 
   const handleTour = async (propertyAddress) => {
     const property = propertyAddress;
-    console.log(property);
     const username = responseData.username;
     try {
       const response = await fetch('http://localhost:8090/handle-tours', {
