@@ -122,11 +122,7 @@ const MyProperties = () => {
       
       {/* Render the form if showForm is true */}
       {showForm && (
-        <div className="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8 flex justify-between items-center">
-          <div className="mt-4 p-4 bg-white rounded">
-            <PropertyForm/>
-          </div>
-        </div>
+          <PropertyForm/>
         
       )}
 
@@ -137,7 +133,7 @@ const MyProperties = () => {
           <img className='rounded-t-lg w-full h-64 object-cover' src={card.real_estate.image} alt="" />
             <div className={`p-5 shadow-lg rounded-lg text-slate-100 ${expandedCard === index ? 'text-slate-700' : 'hover:text-slate-700'}`}>
               <h3 className='text-3x1 font-bold text-slate-700 mb-3'>{card.property_address}</h3>
-              <h3 className={`text-3x1 font-bold mb-3`}>{card.real_estate.introduction}</h3>
+              <h3 className={'text-3x1 font-bold mb-3'}>{card.real_estate.introduction}</h3>
               {expandedCard === index && (
                 <div className="expanded-view">
                   <p>Bedrooms: {card.real_estate.details.bedroom_count}</p>

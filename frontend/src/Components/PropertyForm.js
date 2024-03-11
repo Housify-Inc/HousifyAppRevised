@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col'; // Import Col for better control over the layout
+import { UserCircleIcon, PhotoIcon } from '@heroicons/react/24/solid'; // Import Heroicons icons
 import { getResponseData } from '../ResponseHandler';
 
 function PropertyForm() {
@@ -89,55 +92,73 @@ function PropertyForm() {
     };
 
     return (
-        <div className="container">
-            <h1>Property Information Form</h1>
-            <Form onSubmit={handleSubmit}>
-                <Form.Group controlId="property_address">
-                    <Form.Label>Property Address:</Form.Label>
-                    <Form.Control type="text" name="property_address" value={formData.property_address} onChange={handleInputChange} required />
-                </Form.Group>
+        <div className="container mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
+            <div className="mt-4 p-4 bg-white rounded shadow"> {/* Added shadow for depth */}
+                <h1 className="text-3xl font-semibold mb-4">Property Information Form</h1>
+                <Form onSubmit={handleSubmit}>
+                    <Form.Group className="mb-3" controlId="property_address">
+                        <Form.Label>Property Address:</Form.Label>
+                        <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
+                            <Form.Control className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" type="text" name="property_address" value={formData.property_address} onChange={handleInputChange} required />
+                        </div>
+                    </Form.Group>
 
-                <Form.Group controlId="introduction">
-                    <Form.Label>Introduction:</Form.Label>
-                    <Form.Control type="text" name="introduction" value={formData.introduction} onChange={handleInputChange} />
-                </Form.Group>
+                    <Form.Group className="mb-3" controlId="introduction">
+                        <Form.Label>About:</Form.Label>
+                        <Form.Control className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" type="text" name="introduction" value={formData.introduction} onChange={handleInputChange} />
+                        <p className="mt-3 text-sm leading-6 text-gray-600">Write a few sentences about the property.</p>
+                    </Form.Group>
 
-                <Form.Group controlId="bedroom_count">
-                    <Form.Label>Bedroom Count:</Form.Label>
-                    <Form.Control type="number" name="bedroom_count" value={formData.bedroom_count} onChange={handleInputChange} />
-                </Form.Group>
+                    <Row className="mb-3">
+                            <Form.Group as={Col} controlId="bedroom_count">
+                                <Form.Label>Bedroom Count:</Form.Label>
+                                <Form.Control className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" type="number" name="bedroom_count" value={formData.bedroom_count} onChange={handleInputChange} />
+                            </Form.Group>
 
-                <Form.Group controlId="bathroom_count">
-                    <Form.Label>Bathroom Count:</Form.Label>
-                    <Form.Control type="number" name="bathroom_count" value={formData.bathroom_count} onChange={handleInputChange} />
-                </Form.Group>
+                            <Form.Group as={Col} controlId="bathroom_count">
+                                <Form.Label>Bathroom Count:</Form.Label>
+                                <Form.Control className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" type="number" name="bathroom_count" value={formData.bathroom_count} onChange={handleInputChange} />
+                            </Form.Group>
+                    </Row>
 
-                <Form.Group controlId="rent_price">
-                    <Form.Label>Rent Price:</Form.Label>
-                    <Form.Control type="number" name="rent_price" value={formData.rent_price} onChange={handleInputChange} />
-                </Form.Group>
+                    <Form.Group className="mb-3" controlId="rent_price">
+                        <Form.Label>Rent Price:</Form.Label>
+                        <Form.Control className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" type="number" name="rent_price" value={formData.rent_price} onChange={handleInputChange} />
+                    </Form.Group>
 
-                <Form.Group controlId="available">
-                    <Form.Check type="checkbox" label="Available" name="available" checked={formData.available} onChange={handleInputChange} />
-                </Form.Group>
+                    <Row className="mb-3">
+                        <Col>
+                            <Form.Group className="mb-3" controlId="available">
+                                <Form.Check className="form-check" type="checkbox" label="Available" name="available" checked={formData.available} onChange={handleInputChange} />
+                            </Form.Group>
+                        </Col>
 
-                <Form.Group controlId="laundry">
-                    <Form.Check type="checkbox" label="Laundry Available" name="laundry" checked={formData.laundry} onChange={handleInputChange} />
-                </Form.Group>
+                        <Col>
+                            <Form.Group className="mb-3" controlId="laundry">
+                                <Form.Check className="form-check" type="checkbox" label="Laundry Available" name="laundry" checked={formData.laundry} onChange={handleInputChange} />
+                            </Form.Group>
+                        </Col>
 
-                <Form.Group controlId="pet_friendly">
-                    <Form.Check type="checkbox" label="Pet Friendly" name="pet_friendly" checked={formData.pet_friendly} onChange={handleInputChange} />
-                </Form.Group>
+                        <Col>
+                            <Form.Group className="mb-3" controlId="pet_friendly">
+                                <Form.Check className="form-check" type="checkbox" label="Pet Friendly" name="pet_friendly" checked={formData.pet_friendly} onChange={handleInputChange} />
+                            </Form.Group>
+                        </Col>
+                    </Row>
 
-                <Form.Group controlId="propertyImage">
-                    <Form.Label>Upload Property Image:</Form.Label>
-                    <Form.Control type="file" name="propertyImage" onChange={handleImageChange} />
-                </Form.Group>
+                    <Form.Group className="mb-3" controlId="propertyImage">
+                        <Form.Label>Upload Property Image:</Form.Label>
+                        <div className="mt-2 flex items-center gap-x-3">
+                            <PhotoIcon className="h-12 w-12 text-gray-300" aria-hidden="true" />
+                            <Form.Control className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" type="file" name="propertyImage" onChange={handleImageChange} />
+                        </div>
+                    </Form.Group>
 
-                <Button variant="primary" type="submit">
-                    Submit
-                </Button>
-            </Form>
+                    <Button className="w-full mt-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded" variant="primary" type="submit">
+                        Submit
+                    </Button>
+                </Form>
+            </div>
         </div>
     );
 }

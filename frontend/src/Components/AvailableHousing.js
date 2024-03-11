@@ -52,6 +52,7 @@ const Cards = () => {
 
   const handleTour = async (propertyAddress) => {
     const property = propertyAddress;
+
     const username = responseData.username;
     try {
       const response = await fetch('http://localhost:8090/handle-tours', {
