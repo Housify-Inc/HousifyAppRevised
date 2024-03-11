@@ -35,11 +35,12 @@ const LoginForm = () => {
         });
     
         const responseData = await response.json();
-        setResponseData(responseData);
 
         console.log(responseData);
         // Dummy verification
         if (response.ok) {
+            // add user object to session
+            localStorage.setItem('userSession', JSON.stringify(responseData));
             if (responseData.user_type === 'landlord') {
                 // Navigate to Landlord page
                 console.log('landlord');

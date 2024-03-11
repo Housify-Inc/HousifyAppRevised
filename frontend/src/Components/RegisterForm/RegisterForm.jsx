@@ -100,7 +100,7 @@ const RegisterForm = () => {
                     console.error('Failed to load image properly:', error);
                 }
 
-    
+                localStorage.setItem('userSession', JSON.stringify(responseData));
                 if (responseData.user_type === 'landlord') {
                     // Navigate to Landlord page
                     console.log('landlord');

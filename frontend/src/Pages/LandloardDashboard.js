@@ -1,18 +1,12 @@
-import { Fragment } from 'react'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
-import { useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
+import { useNavigate } from "react-router-dom"
 import Tenants from '../Components/MyTenants'
-import Cards from "../Components/Properties"
 import Tours from '../Components/MyTours'
+import Cards from "../Components/Properties"
 import { getResponseData } from '../ResponseHandler'
 
-const user = {
-  name: 'Tom Cook',
-  email: 'tom@example.com',
-  imageUrl:
-    'https://media.licdn.com/dms/image/C5603AQFZmW2Nm7k2AQ/profile-displayphoto-shrink_800_800/0/1663648587937?e=2147483647&v=beta&t=lKfL6zxaowtklDGfMJw1jMrpkFHQd4YC4t3ADVv0ef0',
-}
 const initialNavigation = [
   // { name: 'Dashboard', href: '#', current: true },
   { name: 'My Properties', href: '#', current: true },
@@ -22,7 +16,7 @@ const initialNavigation = [
 const userNavigation = [
   { name: 'Your Profile', href: '#' },
   { name: 'Settings', href: '#' },
-  { name: 'Sign out', href: '/'},
+  { name: 'Sign out'},
 ]
 
 function classNames(...classes) {
@@ -30,7 +24,42 @@ function classNames(...classes) {
 }
 
 export default function LandLoardDashboard() {
+  const navigate = useNavigate();
+
+  const signOut = () => {
+    localStorage.removeItem('userSession');
+    navigate('/');
+  };
+
   const responseData = getResponseData();
+  console.log(responseData);
+  const [user, setUser] = useState({
+    name: responseData.first_name,
+    email: responseData.username,
+    imageUrl: null
+  });
+  useEffect(() => {
+    const fetchProfilePicture = async () => {
+      try {
+        console.log("in try");
+        const response = await fetch(`http://localhost:8090/image/${responseData.profile_picture}`);
+        if (response.ok) {
+          console.log("response ok")
+          const blob = await response.blob();
+          const imageUrl = URL.createObjectURL(blob);
+          responseData.profile_picture = imageUrl;
+          setUser(prevUser => ({ ...prevUser, imageUrl }));
+        } else {
+          console.error('Failed to fetch profile picture:', response.status);
+        }
+      } catch (error) {
+        console.error('Failed to load image properly:', error);
+      }
+    };
+
+    fetchProfilePicture();
+  }, []);
+
   const [navigation, setNavigation] = useState(initialNavigation);
   const handleNavigationClick = (clickedIndex) => {
     const updatedNavigation = navigation.map((item, index) => ({
@@ -123,21 +152,44 @@ export default function LandLoardDashboard() {
                           leaveTo="transform opacity-0 scale-95"
                         >
                           <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                            {userNavigation.map((item) => (
-                              <Menu.Item key={item.name}>
-                                {({ active }) => (
-                                  <a
-                                    href={item.href}
-                                    className={classNames(
-                                      active ? 'bg-gray-100' : '',
-                                      'block px-4 py-2 text-sm text-gray-700'
+                            {userNavigation.map((item) => {
+                              // Check if the item is 'Sign out'
+                              if (item.name === 'Sign out') {
+                                // Render a button for 'Sign out' that calls signOut on click
+                                return (
+                                  <Menu.Item key={item.name}>
+                                    {({ active }) => (
+                                      <button
+                                        onClick={signOut} // Attach the signOut function to onClick event
+                                        className={classNames(
+                                          active ? 'bg-gray-100' : '',
+                                          'block w-full text-left px-4 py-2 text-sm text-gray-700'
+                                        )}
+                                      >
+                                        {item.name}
+                                      </button>
                                     )}
-                                  >
-                                    {item.name}
-                                  </a>
-                                )}
-                              </Menu.Item>
-                            ))}
+                                  </Menu.Item>
+                                );
+                              }
+
+                              // Render other navigation items normally
+                              return (
+                                <Menu.Item key={item.name}>
+                                  {({ active }) => (
+                                    <a
+                                      href={item.href}
+                                      className={classNames(
+                                        active ? 'bg-gray-100' : '',
+                                        'block px-4 py-2 text-sm text-gray-700'
+                                      )}
+                                    >
+                                      {item.name}
+                                    </a>
+                                  )}
+                                </Menu.Item>
+                              );
+                            })}
                           </Menu.Items>
                         </Transition>
                       </Menu>
