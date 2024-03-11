@@ -589,7 +589,6 @@ def room_handler():
                     room_object = room
                     break
             if room_object is None:
-                # room_instance.create_room()
                 return jsonify(room_instance.create_room()), 201
             # print(all_housemates_array)
             return jsonify(room_object), 200
@@ -597,6 +596,45 @@ def room_handler():
         except RoomNotFoundException as e:
             return jsonify({"errortest": f"{e}"}), 400
 
+@app.route("/get-group-chat", methods=["GET", "OPTIONS", "POST"])
+def group_chat_handler():
+    """
+    This endpoint retrieves the room containing both users
+    """
+    if request.method == "OPTIONS":
+        # Handle CORS preflight request
+        response = jsonify({"message": "CORS preflight request handled"})
+        response.headers["Access-Control-Allow-Origin"] = (
+            "*"  # Allow requests from any origin
+        )
+        response.headers["Access-Control-Allow-Methods"] = (
+            "GET, POST"  # Allow GET and POST methods
+        )
+        response.headers["Access-Control-Allow-Headers"] = (
+            "Content-Type"  # Allow Content-Type header
+        )
+        return response, 200
+    elif request.method == "GET":
+        house = request.args.get("house")
+        if not house:
+            return jsonify({"error": "House is required"}), 400
+        try:
+            room_object = None
+            house_array = [house]
+            room_instance = Rooms(room_users=house_array, messages=[])
+            for room in room_instance.retrieve_all_rooms():
+                print(room["room_users"], house_array)
+                if house_array == room["room_users"]:
+                    room_object = room
+                    break
+            if room_object is None:
+                return jsonify(room_instance.create_room()), 201
+            # print(all_housemates_array)
+            return jsonify(room_object), 200
+
+        except RoomNotFoundException as e:
+            return jsonify({"errortest": f"{e}"}), 400
+        
 @app.route("/handle-tours", methods=["OPTIONS", "POST"])
 def tours_handler():
     if request.method == "OPTIONS":

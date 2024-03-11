@@ -32,9 +32,9 @@ export const Chat = (props) => {
           console.log(roomData._id);
           setMessages(roomData.messages)
 
-          const intervalId = setInterval(() => {
-            handleRoom();
-          }, 5000); // Fetch data every 5 seconds (adjust as needed)
+          // const intervalId = setInterval(() => {
+          //   handleRoom();
+          // }, 5000); // Fetch data every 5 seconds (adjust as needed)
       };
 
       handleRoom();
@@ -74,22 +74,6 @@ export const Chat = (props) => {
     setnewMessage('');
 }
 
-
-
-    // const handleSubmit = async (event) => {
-    //     event.preventDefault();
-    //     if (newMessage === '') return;
-        
-    //     // await addDoc(messagesRef, {
-    //     //     text: newMessage,
-    //     //     createdAt: serverTimestamp(),
-    //     //     user: responseData.first_name + ' ' + responseData.last_name,
-    //     //     room,
-    //     // });
-
-    //     setnewMessage('');
-
-    // }
 
     const boxStyle = {
         width: '200px',

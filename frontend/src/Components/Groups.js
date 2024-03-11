@@ -5,6 +5,7 @@ import Messenger from './Messenger';
 import Payment from './payment';
 import PendingRequests from './GroupRequests';
 import { getResponseData } from '../ResponseHandler';
+import GroupMessaging from './GroupMessaging';
 
 const UserTable = () => {
     const responseData = getResponseData();
@@ -13,6 +14,8 @@ const UserTable = () => {
     const [users, setUsers] = useState([]);
     const [selectedUser, setSelectedUser] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [showGroupMessaging, setShowGroupMessaging] = useState(false);
+    const [selectedHouse, setSelectedHouse] = useState(null);
 
     useEffect(() => {
         const handleGroup = async () => {
@@ -48,6 +51,12 @@ const UserTable = () => {
         window.open(user.payment_info, '_blank');
     };
 
+    const handleGroupMessageClick = (house) => {
+        setShowGroupMessaging(!showGroupMessaging);
+        setSelectedHouse(house);
+        console.log("Housing Info",selectedHouse);
+    };
+
     if (isLoading) {
         return <div>Loading...</div>; // Show loading message while fetching data
     }
@@ -74,10 +83,10 @@ const UserTable = () => {
                         <h1 className="text-xl font-bold">{responseData.housing_group}
                         <button
                             className="flex px-2 py-1 bg-blue-500 text-white rounded-md mr-2"
-                            // onClick={() => handleMessageClick()}
+                            onClick={() => handleGroupMessageClick(responseData.housing_group)}
                         >
                             <FontAwesomeIcon icon={faComment} className="mr-1" />
-                                Message Group 
+                            Message Group
                         </button>
                         </h1>
                         <h1 className="text-xl font-bold">My Housing Group</h1>
@@ -111,7 +120,7 @@ const UserTable = () => {
                         </li>
                     ))}
                 </ul>
-                </div>
+            </div>
                 {/* Payment Form */}
                 {showPaymentForm && (
                     
@@ -129,6 +138,11 @@ const UserTable = () => {
                 {showMessenger && (
                     <div  className="w-half max-w-98 px-10 bg-white rounded-lg py-4 shadow-lg">
                     <Messenger receiver_email_input={`${selectedUser.username}`}/>
+                    </div>
+                )}
+                {showGroupMessaging && (
+                    <div className="w-half max-w-98 px-10 bg-white rounded-lg py-4 shadow-lg">
+                        <GroupMessaging selectedHouse={selectedHouse} />
                     </div>
                 )}
         </div>

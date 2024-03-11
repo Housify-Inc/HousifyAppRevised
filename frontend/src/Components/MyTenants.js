@@ -4,6 +4,7 @@ import { faComment, faMoneyBill } from '@fortawesome/free-solid-svg-icons';
 import Messenger from './Messenger';
 import Payment from './payment';
 import { getResponseData } from '../ResponseHandler';
+import GroupMessaging from './GroupMessaging';
 import { useIsRTL } from 'react-bootstrap/esm/ThemeProvider';
 
 const Tenants = () => {
@@ -13,6 +14,9 @@ const Tenants = () => {
     const [users, setUsers] = useState([]);
     const [selectedUser, setSelectedUser] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [showGroupMessaging, setShowGroupMessaging] = useState(false);
+    const [selectedHouse, setSelectedHouse] = useState(null);
+
     console.log(responseData.my_properties);
     useEffect(() => {
         const handleGroup = async () => {
@@ -53,6 +57,12 @@ const Tenants = () => {
         window.open(user.payment_info, '_blank');
     };
 
+    const handleGroupMessageClick = (house) => {
+        setShowGroupMessaging(!showGroupMessaging);
+        setSelectedHouse(house);
+        console.log("Housing Info",selectedHouse);
+    };
+
     if (isLoading) {
         return <div>Loading...</div>; // Show loading message while fetching data
     }
@@ -80,7 +90,17 @@ const Tenants = () => {
                             <div className="mb-4">
                                 {Array.isArray(userOrArray) ? (
                                     userOrArray.length > 0 && userOrArray[0].housing_group && (
-                                        <h1 className="text-xl font-bold">{userOrArray[0].housing_group}</h1>
+                                        <h1 className="text-xl font-bold">
+                                            {userOrArray[0].housing_group}
+                                            <button
+                                                className="flex px-2 py-1 bg-blue-500 text-white rounded-md ml-2"
+                                                onClick={() => handleGroupMessageClick(userOrArray[0].housing_group)}
+                                            >
+                                                <FontAwesomeIcon icon={faComment} className="mr-1" />
+                                                Message Group
+                                            </button>
+                                        </h1>
+                                        
                                     )
                                 ) : (
                                     userOrArray.housing_group && (
@@ -129,6 +149,11 @@ const Tenants = () => {
             {showMessenger && (
                     <div  className="w-half max-w-98 px-10 bg-white rounded-lg py-4 shadow-lg">
                     <Messenger receiver_email_input={`${selectedUser.username}`}/>
+                    </div>
+            )}
+            {showGroupMessaging && (
+                    <div className="w-half max-w-98 px-10 bg-white rounded-lg py-4 shadow-lg">
+                        <GroupMessaging selectedHouse={selectedHouse} />
                     </div>
             )}
         </div>
