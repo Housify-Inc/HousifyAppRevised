@@ -310,6 +310,12 @@ def tenant_handler():
             house_instance = house_instance.retrieve_housing_info(group)
 
             all_housemates_array = []
+            landlord_instance = User(username=house_instance.property_owner);
+            landlord_instance = landlord_instance.retrieve_user_info(house_instance.property_owner)
+            landlord_info_dict = landlord_instance.to_dict()
+            landlord_info_dict["password"] = ""
+            all_housemates_array.append(landlord_info_dict)
+
             for i in house_instance.group.all_housemates:
                 user_instance = User(
                     username=i,

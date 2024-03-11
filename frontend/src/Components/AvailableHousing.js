@@ -94,6 +94,8 @@ const Cards = () => {
                   <p>Bathrooms: {card.real_estate.details.bathroom_count}</p>
                   <p>Laundry: {card.real_estate.laundry ? 'Yes' : 'No'}</p>
                   <p>Pet Friendly: {card.real_estate.pet_friendly ? 'Yes' : 'No'}</p>
+                  <p>Rent Price: {card.real_estate.rent_price}</p>
+                  <p>Owner Contact Info: {card.real_estate.property_owner}</p>
                   {/* Add more information as needed */}
                   <button type="button" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={() => handleTour(card.property_address)}>
                           Tour this Property
