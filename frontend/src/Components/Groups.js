@@ -57,6 +57,28 @@ const UserTable = () => {
         console.log("Housing Info",selectedHouse);
     };
 
+    const handleLeaveGroup = async () => {
+        const leaveGroupURL = 'http://localhost:8090/remove_user_from_group';
+
+        const response = await fetch(leaveGroupURL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                username: responseData.username
+            }),
+        });
+        
+        const responseDataPost = await response.json();
+        
+        if (response.ok) {
+            console.log('Message added successfully:', responseDataPost.message);
+        } else {
+            console.error('Error adding message:', responseDataPost.error);
+        }
+    };
+
     if (isLoading) {
         return (
             <div className="d-flex justify-content-center align-items-center">
@@ -91,9 +113,17 @@ const UserTable = () => {
                         className="flex px-2 py-1 bg-blue-500 text-white rounded-md ml-4"
                         onClick={() => handleGroupMessageClick(responseData.housing_group)}
                     >
-                    <FontAwesomeIcon icon={faComment} className="mr-1" />
-                    Message Group
+                        <FontAwesomeIcon icon={faComment} className="mr-1" />
+                        Message Group
                     </button>
+                        <div className="ml-auto px-5">
+                            <button
+                                className="px-2 py-1 bg-red-500 text-white rounded-md"
+                                onClick={handleLeaveGroup}
+                            >
+                                Leave
+                            </button>
+                        </div>
                 </div>
 
                 </div>

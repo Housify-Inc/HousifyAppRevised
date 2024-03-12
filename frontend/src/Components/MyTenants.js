@@ -66,6 +66,29 @@ const Tenants = () => {
         console.log("Housing Info",selectedHouse);
     };
 
+    const handleKickButtonClick = async (user) => {
+        const leaveGroupURL = 'http://localhost:8090/remove_user_from_group';
+
+        const response = await fetch(leaveGroupURL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                username: user.username
+            }),
+        });
+        
+        const responseDataPost = await response.json();
+        
+        if (response.ok) {
+            console.log('Message added successfully:', responseDataPost.message);
+        } else {
+            console.error('Error adding message:', responseDataPost.error);
+        }
+    };
+
+
     if (isLoading) {
         return (
             <div className="d-flex justify-content-center align-items-center">
@@ -142,6 +165,12 @@ const Tenants = () => {
                                         >
                                             <FontAwesomeIcon icon={faMoneyBill} className="mr-1" />
                                             Pay
+                                        </button>
+                                        <button
+                                        className="flex items-center justify-center px-6 py-1 bg-red-500 text-white rounded-md"
+                                        onClick={() => handleKickButtonClick(person)}
+                                        >
+                                            Kick
                                         </button>
                                     </div>
                                 </li>

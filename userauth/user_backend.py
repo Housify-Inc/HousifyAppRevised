@@ -770,6 +770,35 @@ def message_handler():
             return jsonify(room_instance.to_dict()), 200
         except RoomNotFoundException as e:
             return jsonify({"errortest": f"{e}"}), 400
+        
+
+@app.route("/remove_user_from_group", methods=["OPTIONS", "POST"])
+def remove_user_handler():
+    if request.method == "OPTIONS":
+        # Handle CORS preflight request
+        response = jsonify({"message": "CORS preflight request handled"})
+        response.headers["Access-Control-Allow-Origin"] = (
+            "*"  # Allow requests from any origin
+        )
+        response.headers["Access-Control-Allow-Methods"] = (
+            "GET, POST"  # Allow GET and POST methods
+        )
+        response.headers["Access-Control-Allow-Headers"] = (
+            "Content-Type"  # Allow Content-Type header
+        )
+        return response, 200
+
+    elif request.method == "POST":
+        try:
+           data = request.json
+           username = data.get("username")
+           print("THis isthe username sow can tpslel: " + username)
+           user_instance = User().retrieve_user_info(username=username)
+           user_instance.remove_user_and_house_from_group(username)
+           user_instance.print_user_info()
+           return jsonify(user_instance.to_dict()), 200
+        except RoomNotFoundException as e:
+            return jsonify({"errortest": f"{e}"}), 400
 
 
 if __name__ == "__main__":

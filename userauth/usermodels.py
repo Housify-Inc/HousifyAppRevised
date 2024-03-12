@@ -364,7 +364,7 @@ class User:
         landlord_instance.update_user_info()
         user_instance.update_user_info()
 
-def remove_user_and_house_from_group(self, username):
+    def remove_user_and_house_from_group(self, username):
         """
         Remove the user from their housing_group and then remove the user from
         the corresponding HouseInfo's all_housemates list.
