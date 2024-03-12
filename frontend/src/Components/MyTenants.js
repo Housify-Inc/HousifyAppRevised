@@ -11,12 +11,12 @@ const Tenants = () => {
     const [showPaymentForm, setShowPaymentForm] = useState(false);
     const [showMessenger, setShowMessenger] = useState(false);
     const [users, setUsers] = useState([]);
+    const [noUsers, setnoUsers] = useState(true);
     const [selectedUser, setSelectedUser] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [showGroupMessaging, setShowGroupMessaging] = useState(false);
     const [selectedHouse, setSelectedHouse] = useState(null);
 
-    console.log(responseData.my_properties);
     useEffect(() => {
         const handleGroup = async () => {
             if (!responseData.my_properties) {
@@ -45,6 +45,9 @@ const Tenants = () => {
                 subArray.filter(user => user.username !== responseData.username)
             );
             setUsers(filteredArray);
+            if(users.length === 0){
+                setnoUsers(true);
+            }
             setIsLoading(false); // Set loading to false after data is fetched
         };
         handleGroup();
@@ -82,6 +85,13 @@ const Tenants = () => {
         const responseDataPost = await response.json();
         
         if (response.ok) {
+            const updatedUsers = users.map(userOrArray =>
+                Array.isArray(userOrArray)
+                    ? userOrArray.filter(person => person.username !== user.username)
+                    : userOrArray
+            );
+            // Update the state with the filtered array
+            setUsers(updatedUsers);
             console.log('Message added successfully:', responseDataPost.message);
         } else {
             console.error('Error adding message:', responseDataPost.error);
@@ -100,12 +110,12 @@ const Tenants = () => {
     }
 
 
-    if (!responseData.housing_group) {
+    if (noUsers) {
         return(
         <div className="flex justify-center items-start h-screen">
             <div className="max-w-98 px-10">
                 <div className="mb-4">
-                    <h1 className="text-4xl font-bold text-slate-100">You are not in any Housing Groups</h1>
+                    <h1 className="text-4xl font-bold text-slate-100">You do not have any Tenants</h1>
                 </div>
             </div>
         </div>

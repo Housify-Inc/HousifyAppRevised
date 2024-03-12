@@ -5,11 +5,12 @@ import { getResponseData, updateUser } from '../ResponseHandler';
 const PendingRequests = () => {
   const [pendingRequests, setPendingRequests] = useState([]);
   const responseData = getResponseData();
+  const [confirmationMessages, setConfirmationMessages] = useState({});
 
   useEffect(() => {
     // Fetch and set pending requests when component mounts
     setPendingRequests(responseData.pending_requests);
-  }, []); // Ensure useEffect runs when pending_requests changes
+  }, []);
   
   const handleAccept = async (request) => {
     try {
@@ -31,7 +32,9 @@ const PendingRequests = () => {
       // setPendingRequests(pendingRequests.filter(req => req !== request));
       updateUser(responseData.username);
       console.log('Accepted:', request);
-
+      const updatedMessages = { ...confirmationMessages };
+      updatedMessages[request] = 'Request accepted';
+      setConfirmationMessages(updatedMessages);
       // Update form data after successful accept
     } catch (error) {
       console.error('Failed to accept request properly:', error);
@@ -56,7 +59,9 @@ const PendingRequests = () => {
       
       updateUser(responseData.username);
       console.log('Rejected:', request);
-
+      const updatedMessages = { ...confirmationMessages };
+      updatedMessages[request] = 'Request rejected';
+      setConfirmationMessages(updatedMessages);
       // Update pending requests after successful reject
       // setPendingRequests(pendingRequests.filter(req => req !== request));
     } catch (error) {
@@ -73,6 +78,7 @@ const PendingRequests = () => {
             <p className="font-bold px-5">Property Address: {request.split('-')[1]}</p>
             <Button variant="success" className="flex items-center justify-center px-2 py-1 bg-green-500 text-white rounded-md mr-2" onClick={() => handleAccept(request)}>Accept</Button>
             <Button variant="danger" className="flex items-center justify-center px-2 py-1 bg-red-500 text-white rounded-md" onClick={() => handleReject(request)}>Reject</Button>
+            {confirmationMessages[request] && <div className="ml-3">{confirmationMessages[request]}</div>}
           </div>
         </div>
       ))}

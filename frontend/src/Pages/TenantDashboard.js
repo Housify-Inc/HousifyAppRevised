@@ -21,8 +21,6 @@ const initialNavigation = [
 ]
 
 const userNavigation = [
-  { name: 'Your Profile', href: '#' },
-  { name: 'Settings', href: '#' },
   // Removed href from 'Sign out'
   { name: 'Sign out' },
 ]
@@ -45,7 +43,7 @@ export default function TenantDashboard() {
   const [user, setUser] = useState({
     name: responseData.first_name,
     email: responseData.username,
-    imageUrl: null
+    imageUrl: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'
   });
   useEffect(() => {
     const fetchProfilePicture = async () => {
@@ -134,15 +132,6 @@ export default function TenantDashboard() {
                   </div>
                   <div className="hidden md:block">
                     <div className="ml-4 flex items-center md:ml-6">
-                      <button
-                        type="button"
-                        className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
-                      >
-                        <span className="absolute -inset-1.5" />
-                        <span className="sr-only">View notifications</span>
-                        <BellIcon className="h-6 w-6" aria-hidden="true" />
-                      </button>
-
                       {/* Profile dropdown */}
                       <Menu as="div" className="relative ml-3">
                         <div>

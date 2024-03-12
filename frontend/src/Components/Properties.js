@@ -14,6 +14,8 @@ const MyProperties = () => {
   const [propertiesData, setPropertiesData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [email, setEmail] = useState("");
+  const [submittedCardIndex, setSubmittedCardIndex] = useState(null);
+
   useEffect(() => {
     const handleListings = async () => {
         const propertiesUrl = `http://localhost:8090/landlord_properties?username=${responseData.username}`;
@@ -61,11 +63,8 @@ const MyProperties = () => {
     setShowForm(!showForm);
   };
 
-  const toggleEmailForm = () => {
-    setShowEmailForm(!showEmailForm);
-  };
   // Function to handle form submission
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e, index) => {
     e.preventDefault();
   
     // Get the current card's address
@@ -90,6 +89,7 @@ const MyProperties = () => {
       });
   
       if (response.ok) {
+        setSubmittedCardIndex(index);
         console.log("Request sent successfully");
       } else {
         const errorMessage = await response.text();
@@ -174,7 +174,7 @@ const MyProperties = () => {
                   <p>Pet Friendly: {card.real_estate.pet_friendly ? 'Yes' : 'No'}</p>
                   {/* Add more information as needed */}
                     <div onClick={(e) => e.stopPropagation()}>
-                      <Form onSubmit={handleSubmit}>
+                      <Form onSubmit={(e) => handleSubmit(e, index)}>
                         <Form.Group controlId="email">
                         <Form.Label>Email Address:</Form.Label>
                         <Form.Control 
@@ -185,6 +185,9 @@ const MyProperties = () => {
                           />
                         </Form.Group>
                         <div className="flex justify-between items-center mb-3 py-5">
+                            {submittedCardIndex === index && (
+                              <div className="text-green-500 font-bold mb-3">User added to group successfully!</div>
+                            )}
                           <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                             Submit
                           </button>

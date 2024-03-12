@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getResponseData } from '../ResponseHandler';
+import { getResponseData} from '../ResponseHandler';
 import { Spinner } from 'react-bootstrap';
 
 const Cards = () => {
@@ -7,6 +7,7 @@ const Cards = () => {
   const [housingData, setHousingData] = useState([]);
   const [expandedCard, setExpandedCard] = useState(null);
   const[isLoading, setIsLoading] = useState(true);
+  const [confirmationMessages, setConfirmationMessages] = useState({});
   useEffect(() => {
     const handleListings = async () => {
       try {
@@ -54,7 +55,8 @@ const Cards = () => {
     }
   };
 
-  const handleTour = async (propertyAddress) => {
+  const handleTour = async (propertyAddress, event) => {
+    event.stopPropagation();
     const property = propertyAddress;
 
     const username = responseData.username;
@@ -68,13 +70,22 @@ const Cards = () => {
       });
       if (response.ok) {
         // Handle success
+        const updatedMessages = { ...confirmationMessages };
+        updatedMessages[propertyAddress] = 'Tour request sent successfully';
+        setConfirmationMessages(updatedMessages);
         console.log('Tour request sent successfully');
       } else {
         // Handle error
+        const updatedMessages = { ...confirmationMessages };
+        updatedMessages[propertyAddress] = 'Failed to send tour request';
+        setConfirmationMessages(updatedMessages);
         console.error('Failed to send tour request');
       }
     } catch (error) {
       console.error('Error sending tour request:', error);
+      const updatedMessages = { ...confirmationMessages };
+      updatedMessages[propertyAddress] = 'Error sending tour request';
+      setConfirmationMessages(updatedMessages);
     }
   };
   if (isLoading) {
@@ -110,9 +121,12 @@ const Cards = () => {
                   <p>Rent Price: {card.real_estate.rent_price}</p>
                   <p>Owner Contact Info: {card.real_estate.property_owner}</p>
                   {/* Add more information as needed */}
-                  <button type="button" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={() => handleTour(card.property_address)}>
+                  <button type="button" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={(event) => handleTour(card.property_address, event)}>
                           Tour this Property
                   </button>
+                  {confirmationMessages[card.property_address] && (
+                    <div className="mt-2 text-green-500">{confirmationMessages[card.property_address]}</div>
+                  )}
                 </div>
               )}
             </div>

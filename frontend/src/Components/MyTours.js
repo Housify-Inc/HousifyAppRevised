@@ -1,13 +1,16 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react'; // Import useState
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import { getResponseData } from '../ResponseHandler';
 const Tours = () => {
   const responseData = getResponseData();
-  console.log(responseData);
-  const tours = responseData.upcoming_tours;
-  console.log(tours);
+  const [tours, setTours] = useState([]); 
+  useEffect(() => {
+    // Initialize tours state with upcoming tours from response data
+    setTours(responseData.upcoming_tours);
+  }, []);
+  
 
   const handleDeleteTour = async (address) => {
     const deleteTourUrl = 'http://localhost:8090/delete_tour';
@@ -27,7 +30,8 @@ const Tours = () => {
         const responseDataPost = await response.json();
         
         if (response.ok) {
-            console.log('Message added successfully:', responseDataPost);
+          setTours(prevTours => prevTours.filter((tour) => tour.tour_address !== address));
+          console.log('Message added successfully:', responseDataPost);
         } else {
             console.error('Error adding message:', responseDataPost.error);
         }
