@@ -325,13 +325,6 @@ class User:
 
     def add_tour(self, property_address): 
 
-        '''
-        Call this method from the tenant view. Will append to the landlord upcoming_tours field.
-
-        User Notes:
-        1. Landlord - Sees the contact information of tenant (First Name, Last Name, username (email), phone number, Address of Property requested)
-        2. Tenant - Sees the contact information of landlord (First Name, Last Name, username (email), phone number, Address of Property requested)
-        '''
         # retrieve property owner info from house
         house_instance = House().retrieve_housing_info(property_address)
         if house_instance is None:
@@ -365,16 +358,6 @@ class User:
         user_instance.update_user_info()
 
     def remove_user_and_house_from_group(self, username):
-        """
-        Remove the user from their housing_group and then remove the user from
-        the corresponding HouseInfo's all_housemates list.
-
-        Parameters:
-        - username_to_remove (str): The username of the user to remove.
-
-        Raises:
-        - HouseNotFoundException: If the user's housing_group is empty or the property address is not found in the HouseInfo database.
-        """
         # Ensure the user has a housing group
         if not self.housing_group:
             raise HouseNotFoundException(f"No housing group found for user {self.username}")
@@ -393,7 +376,16 @@ class User:
                 raise UserNotFoundException(f"User {username} not found in house {property}")
         except HouseNotFoundException: #throww an exception for missing property (do not need this, just in case issues arise...
             print(f"House not found for address: {property}")
-
+    
+    def delete_tour(self, property_address): #helper method used for delete_property()
+        user_instance = User().retrieve_user_info(property_address)
+    
+        for tour in user_instance.upcoming_tours:
+            if tour["tour_address"] == property_address:
+                user_instance.upcoming_tours.remove(tour)
+                user_instance.update_user_info()
+                break
+        
 def retrieve_landlord_property_info(username):
     # Retrieve the user information
     user_info = User().retrieve_user_info(username)
@@ -418,4 +410,36 @@ def retrieve_landlord_property_info(username):
     else:
         # If the user is not a landlord, return an empty list
         return []
+    
 
+def delete_property(property_address):
+    house_instance = House().retrieve_house_info(property_address)
+    #look at the landlord for any pending tours regarding address"
+    property_owner = house_instance.property_owner
+    property_owner_instance = User().retrieve_user_info(property_owner)
+    owner_tours = property_owner_instance.upcoming_tours
+    for tour in owner_tours:
+        if tour["tour_address"] == property_address:
+            property_owner_instance.upcoming_tours.remove(tour)
+            property_owner_instance.update_user_info()
+            #check the users involved with the tours and also delete the tour there as well
+            prospective_tenant = str(tour["username"])
+            prospective_tenant_instance = User().retrieve_user_info(prospective_tenant)
+            prospective_tenant_instance.delete_tour(property_address)
+
+
+    #we delete the housemates in group first (tenants)
+
+    for tenant in house_instance.group.all_housemates:
+        user_instance = User().retrieve_user_info(tenant)
+        user_instance.housing_group = ""
+        user_instance.update_user_info()
+    #delete (house from database)
+    connection_string = "mongodb+srv://housify-customer-account-test1:housify-customer-test1@houseinfo.5nbfw82.mongodb.net/"
+    client = MongoClient(connection_string, tlsCaFile=ca)
+    db = client.HousesDatabase
+    collection = db.HouseInfo
+
+    collection.delete_one({"property_address": property_address})
+
+    client.close()    

@@ -246,9 +246,7 @@ class House:
     # accept_request_to_group(property_address): Tenant can accept request to join landlord's housing group
     ########################################################################
 
-    def generate_request_id(
-        self, tenant_username
-    ):  # Requests user on behalf of house to join group
+    def generate_request_id(self, tenant_username):  # Requests user on behalf of house to join group
         request_id = f"{tenant_username}-{self.property_address}"
         print(f"PRINTING REQUEST ID AT GENERATE: {request_id}")
         return request_id
