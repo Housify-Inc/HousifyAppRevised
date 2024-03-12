@@ -2,10 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faComment, faMoneyBill } from '@fortawesome/free-solid-svg-icons';
 import Messenger from './Messenger';
-import Payment from './payment';
 import { getResponseData } from '../ResponseHandler';
 import GroupMessaging from './GroupMessaging';
-import { useIsRTL } from 'react-bootstrap/esm/ThemeProvider';
+import { Spinner } from 'react-bootstrap';
 
 const Tenants = () => {
     const responseData = getResponseData();
@@ -42,6 +41,10 @@ const Tenants = () => {
             // Update state with fetched housing group data
             setUsers(groupDataArray);
             console.log(users);
+            const filteredArray = groupDataArray.map(subArray =>
+                subArray.filter(user => user.username !== responseData.username)
+            );
+            setUsers(filteredArray);
             setIsLoading(false); // Set loading to false after data is fetched
         };
         handleGroup();
@@ -64,8 +67,15 @@ const Tenants = () => {
     };
 
     if (isLoading) {
-        return <div>Loading...</div>; // Show loading message while fetching data
+        return (
+            <div className="d-flex justify-content-center align-items-center">
+                <Spinner animation="border" role="status" style={{ color: 'white' }}>
+                    <span className="visually-hidden">Loading...</span>
+                </Spinner>
+            </div>
+        );
     }
+
 
     if (!responseData.housing_group) {
         return(
@@ -81,16 +91,16 @@ const Tenants = () => {
     }
 
     return (
-        <div className="container mx-auto px-2 py-8 flex">
+        <div className="container mx-auto px-2 py-8 flex mb-4">
             {users.map((userOrArray, index) => (
                 // Check if userOrArray is empty or undefined
                 userOrArray && userOrArray.length > 0 && (
-                    <div key={index} className="w-half max-w-98 px-10 bg-white rounded-lg py-4 shadow-lg" style={{ paddingTop: '10vh' }}>
-                        <div className="max-w-98 px-10">
-                            <div className="mb-4">
+                    <div key={index} className="w-half max-w-98 px-10 bg-white rounded-lg py-4 shadow-lg mb-4">
+                        <div className="max-w-98 px-10 mb-4">
+                            <div className="mb-4 flex items-center">
                                 {Array.isArray(userOrArray) ? (
                                     userOrArray.length > 0 && userOrArray[0].housing_group && (
-                                        <h1 className="text-xl font-bold">
+                                        <h1 className="text-xl font-bold flex items-center">
                                             {userOrArray[0].housing_group}
                                             <button
                                                 className="flex px-2 py-1 bg-blue-500 text-white rounded-md ml-2"
@@ -140,12 +150,6 @@ const Tenants = () => {
                     </div>
                 )
             ))}
-            {showPaymentForm && (
-                <div className="w-half max-w-98 px-10 bg-white rounded-lg py-4 shadow-lg">
-                    <h2 className="text-xl font-bold mb-2">Payment Form</h2>
-                    <Payment />
-                </div>
-            )}
             {showMessenger && (
                     <div  className="w-half max-w-98 px-10 bg-white rounded-lg py-4 shadow-lg">
                     <Messenger receiver_email_input={`${selectedUser.username}`}/>

@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { getResponseData } from '../ResponseHandler';
+import { Spinner } from 'react-bootstrap';
 
 const Cards = () => {
   const responseData = getResponseData();
   const [housingData, setHousingData] = useState([]);
   const [expandedCard, setExpandedCard] = useState(null);
+  const[isLoading, setIsLoading] = useState(true);
   useEffect(() => {
     const handleListings = async () => {
       try {
@@ -15,6 +17,7 @@ const Cards = () => {
           },
         });
         if (!response.ok) {
+          setIsLoading(false);
           throw new Error('Failed to fetch housing data');
         }
         const housingData = await response.json();
@@ -32,7 +35,8 @@ const Cards = () => {
           } catch (error) {
               console.error(`Failed to load image properly for house ${house.property_address}:`, error);
           }
-      }
+        }
+        setIsLoading(false);
         setHousingData(housingData);
       } catch (error) {
         console.error('Error fetching housing data:', error);
@@ -73,6 +77,15 @@ const Cards = () => {
       console.error('Error sending tour request:', error);
     }
   };
+  if (isLoading) {
+    return (
+        <div className="d-flex justify-content-center align-items-center">
+            <Spinner animation="border" role="status" style={{ color: 'white' }}>
+                <span className="visually-hidden">Loading...</span>
+            </Spinner>
+        </div>
+    );
+  }
 
   return (
     <main className='container mx-auto px-8'>

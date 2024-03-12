@@ -23,7 +23,37 @@ ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
 def allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
+@app.route("/update_user", methods=["GET", "OPTIONS"])
+def update_handler():
+    if request.method == "OPTIONS":
+        # Handle CORS preflight request
+        response = jsonify({"message": "CORS preflight request handled"})
+        response.headers["Access-Control-Allow-Origin"] = (
+            "*"  # Allow requests from any origin
+        )
+        response.headers["Access-Control-Allow-Methods"] = (
+            "GET, POST"  # Allow GET and POST methods
+        )
+        response.headers["Access-Control-Allow-Headers"] = (
+            "Content-Type"  # Allow Content-Type header
+        )
+        return response, 200
 
+    elif request.method == "GET":
+        try:
+            print("hello")
+            username = request.args.get("username")
+            print(username)
+            user_instance = User().retrieve_user_info(username=username)
+            user_info_dict = user_instance.to_dict()
+            user_instance.print_user_info()
+            user_info_dict["password"] = ""
+            return jsonify(user_info_dict), 200
+
+        except Exception as e:
+            print("\n\nCan't Update user data\n\n")
+            return jsonify({"error": str(e)}), 404
+        
 @app.route("/property-image/<image_id>", methods=["GET", "OPTIONS"])
 def serve_image_handler(image_id):
     """
@@ -453,6 +483,37 @@ def accept_handler():
             print("Request accepted:", request_str)
 
             return jsonify({"message": "Request accepted successfully"}), 200
+        except Exception as e:
+            return jsonify({"error": str(e)}), 400
+
+@app.route("/decline-request", methods=["GET", "POST", "OPTIONS"])
+def decline_handler():
+    if request.method == "OPTIONS":
+        # Handle CORS preflight request
+        response = jsonify({"message": "CORS preflight request handled"})
+        response.headers["Access-Control-Allow-Origin"] = (
+            "*"  # Allow requests from any origin
+        )
+        response.headers["Access-Control-Allow-Methods"] = (
+            "GET, POST"  # Allow GET and POST methods
+        )
+        response.headers["Access-Control-Allow-Headers"] = (
+            "Content-Type"  # Allow Content-Type header
+        )
+        return response, 200
+
+    elif request.method == "POST":
+        try:
+            data = request.json
+            request_str = data["request"]  # Assuming the request is sent as a string# This will print the received request
+            username, property_address = request_str.split("-")
+            # Now you can use the request as needed
+            # For demonstration, I'm just printing the request here
+            user_instance = User(username=username)
+            print(request_str)
+            user_instance.reject_request(request_id=request_str)
+            print("Request declined:", request_str)
+            return jsonify({"message": "Request declined successfully"}), 200
         except Exception as e:
             return jsonify({"error": str(e)}), 400
 

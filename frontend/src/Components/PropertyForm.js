@@ -18,6 +18,7 @@ function PropertyForm() {
         pet_friendly: false,
     });
     const [propertyImage, setPropertyImage] = useState(null);
+    const [isSubmitted, setIsSubmitted] = useState(false);
 
     const handleInputChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -78,7 +79,7 @@ function PropertyForm() {
                   console.error('Failed to load image properly:', error);
               }
 
-
+              setIsSubmitted(true);
               console.log("House added successfully");
               console.log("Response Data received: ", responseData);
               // You might want to redirect the user or clear the form here
@@ -95,6 +96,9 @@ function PropertyForm() {
         <div className="container mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
             <div className="mt-4 p-4 bg-white rounded shadow"> {/* Added shadow for depth */}
                 <h1 className="text-3xl font-semibold mb-4">Property Information Form</h1>
+                {isSubmitted ? ( // Show confirmation message if form is submitted
+                    <div className="text-green-600 font-semibold mb-4">Form submitted successfully!</div>
+                ) : (
                 <Form onSubmit={handleSubmit}>
                     <Form.Group className="mb-3" controlId="property_address">
                         <Form.Label>Property Address:</Form.Label>
@@ -158,6 +162,7 @@ function PropertyForm() {
                         Submit
                     </Button>
                 </Form>
+                )}
             </div>
         </div>
     );

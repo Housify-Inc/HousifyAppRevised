@@ -3,6 +3,7 @@ import Form from 'react-bootstrap/Form';
 import data from './data';
 import PropertyForm from './PropertyForm';
 import { getResponseData } from '../ResponseHandler';
+import { Spinner } from 'react-bootstrap';
 
 const MyProperties = () => {
   // State to control the visibility of the form
@@ -11,6 +12,7 @@ const MyProperties = () => {
   const responseData = getResponseData();
   const [expandedCard, setExpandedCard] = useState(null);
   const [propertiesData, setPropertiesData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [email, setEmail] = useState("");
   useEffect(() => {
     const handleListings = async () => {
@@ -23,6 +25,7 @@ const MyProperties = () => {
                 },
             });
             if (!response.ok) {
+              setIsLoading(false);
                 throw new Error('Failed to fetch housing data');
             }
             const properties = await response.json();
@@ -42,7 +45,7 @@ const MyProperties = () => {
                     console.error(`Failed to load image properly for property ${property.property_address}:`, error);
                 }
             }
-
+            setIsLoading(false);
             setPropertiesData(properties);
             console.log("Properties for this Landlord", propertiesData);
         } catch (error) {
@@ -105,7 +108,15 @@ const MyProperties = () => {
       setExpandedCard(index); // Expand the clicked card
     }
   };
-
+  if (isLoading) {
+    return (
+        <div className="d-flex justify-content-center align-items-center">
+            <Spinner animation="border" role="status" style={{ color: 'white' }}>
+                <span className="visually-hidden">Loading...</span>
+            </Spinner>
+        </div>
+    );
+}
   return (
     <main className='container mx-auto px-8'>
       <header>

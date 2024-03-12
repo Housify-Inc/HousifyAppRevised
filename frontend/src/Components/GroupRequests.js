@@ -1,17 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from 'react-bootstrap';
-import { getResponseData } from '../ResponseHandler';
+import { getResponseData, updateUser } from '../ResponseHandler';
 
 const PendingRequests = () => {
   const [pendingRequests, setPendingRequests] = useState([]);
   const responseData = getResponseData();
-  const [formData, setFormData] = useState({});
-  
+
   useEffect(() => {
     // Fetch and set pending requests when component mounts
     setPendingRequests(responseData.pending_requests);
-  }, [responseData.pending_requests]); // Ensure useEffect runs when pending_requests changes
-
+  }, []); // Ensure useEffect runs when pending_requests changes
+  
   const handleAccept = async (request) => {
     try {
       // Send the request to the backend
@@ -24,18 +23,45 @@ const PendingRequests = () => {
       });
   
       if (!response.ok) {
+        
         throw new Error('Failed to accept request');
       }
-  
+
+      // Update pending requests after successful accept
+      // setPendingRequests(pendingRequests.filter(req => req !== request));
+      updateUser(responseData.username);
       console.log('Accepted:', request);
+
+      // Update form data after successful accept
     } catch (error) {
       console.error('Failed to accept request properly:', error);
     }
   };  
 
-  const handleReject = (request) => {
-    // Logic to reject the request
-    console.log('Rejected:', request);
+  const handleReject = async (request) => {
+    try {
+      // Send the request to the backend
+      const response = await fetch('http://localhost:8090/decline-request', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json' // Specify the content type
+        },
+        body: JSON.stringify({ request }) // Send the request string directly
+      });
+  
+      if (!response.ok) {
+        
+        throw new Error('Failed to decline request');
+      }
+      
+      updateUser(responseData.username);
+      console.log('Rejected:', request);
+
+      // Update pending requests after successful reject
+      // setPendingRequests(pendingRequests.filter(req => req !== request));
+    } catch (error) {
+      console.error('Failed to reject request properly:', error);
+    }
   };
 
   return (
@@ -45,7 +71,7 @@ const PendingRequests = () => {
         <div key={index} className="bg-white rounded-lg shadow-lg p-5 mb-5" style={{ borderRadius: '20px' }}>
           <div className="flex mt-4">
             <p className="font-bold px-5">Property Address: {request.split('-')[1]}</p>
-            <Button variant="success" className="flex items-center justify-center px-2 py-1 bg-green-500 text-white rounded-md mr-2" onClick={() => {setFormData(request); handleAccept(request);}}>Accept</Button>
+            <Button variant="success" className="flex items-center justify-center px-2 py-1 bg-green-500 text-white rounded-md mr-2" onClick={() => handleAccept(request)}>Accept</Button>
             <Button variant="danger" className="flex items-center justify-center px-2 py-1 bg-red-500 text-white rounded-md" onClick={() => handleReject(request)}>Reject</Button>
           </div>
         </div>
@@ -55,4 +81,3 @@ const PendingRequests = () => {
 };
 
 export default PendingRequests;
-

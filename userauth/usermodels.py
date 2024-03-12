@@ -316,9 +316,12 @@ class User:
         house_instance.update_housing_info()
 
     def reject_request(self, request_id): #joins new user to housing group
-        self.pending_requests.remove(request_id)
+        username, property_address = request_id.split("-")
+        user_instance = User(username=username).retrieve_user_info(username=username)
+        user_instance.print_user_info()
+        user_instance.pending_requests.remove(request_id)
         # Updating the user_instance with the new information
-        self.update_user_info()
+        user_instance.update_user_info()
 
     def add_tour(self, property_address): 
 

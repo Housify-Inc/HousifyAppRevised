@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faComment, faMoneyBill } from '@fortawesome/free-solid-svg-icons';
 import Messenger from './Messenger';
-import Payment from './payment';
 import PendingRequests from './GroupRequests';
 import { getResponseData } from '../ResponseHandler';
 import GroupMessaging from './GroupMessaging';
+import { Spinner } from 'react-bootstrap';
 
 const UserTable = () => {
     const responseData = getResponseData();
@@ -58,7 +58,13 @@ const UserTable = () => {
     };
 
     if (isLoading) {
-        return <div>Loading...</div>; // Show loading message while fetching data
+        return (
+            <div className="d-flex justify-content-center align-items-center">
+                <Spinner animation="border" role="status" style={{ color: 'white' }}>
+                    <span className="visually-hidden">Loading...</span>
+                </Spinner>
+            </div>
+        );
     }
 
     if (!responseData.housing_group) {
@@ -79,18 +85,17 @@ const UserTable = () => {
         <div className="container mx-auto px-2 py-8 flex">
             <div className="w-half max-w-98 px-10 bg-white rounded-lg py-4 shadow-lg" >
                 <div className="max-w-98 px-10">
-                    <div className="mb-4">
-                        <h1 className="text-xl font-bold">{responseData.housing_group}
-                        <button
-                            className="flex px-2 py-1 bg-blue-500 text-white rounded-md mr-2"
-                            onClick={() => handleGroupMessageClick(responseData.housing_group)}
-                        >
-                            <FontAwesomeIcon icon={faComment} className="mr-1" />
-                            Message Group
-                        </button>
-                        </h1>
-                        <h1 className="text-xl font-bold">My Housing Group</h1>
-                    </div>
+                <div className="mb-4 flex items-center"> {/* Wrap the content in a flex container */}
+                    <h1 className="text-xl font-bold">{responseData.housing_group}</h1>
+                    <button
+                        className="flex px-2 py-1 bg-blue-500 text-white rounded-md ml-4"
+                        onClick={() => handleGroupMessageClick(responseData.housing_group)}
+                    >
+                    <FontAwesomeIcon icon={faComment} className="mr-1" />
+                    Message Group
+                    </button>
+                </div>
+
                 </div>
                 <ul role="list" className="ml-0">
                     {users.map((user, index) => (
@@ -121,20 +126,6 @@ const UserTable = () => {
                     ))}
                 </ul>
             </div>
-                {/* Payment Form */}
-                {showPaymentForm && (
-                    
-                    <div  className="w-half max-w-98 px-10 bg-white rounded-lg py-4 shadow-lg">
-                        <h2 className="text-xl font-bold mb-2">Payment Form</h2>
-                            <Payment/>
-                        {/* <form>
-                            <label htmlFor="paymentAmount">Payment Amount:</label>
-                            <input type="text" id="paymentAmount" name="paymentAmount" />
-                            <button type="submit" className="mt-2 bg-blue-500 text-white px-4 py-2 rounded-md">Submit Payment</button>
-                        </form> */}
-                    </div>
-                    )
-                }
                 {showMessenger && (
                     <div  className="w-half max-w-98 px-10 bg-white rounded-lg py-4 shadow-lg">
                     <Messenger receiver_email_input={`${selectedUser.username}`}/>
