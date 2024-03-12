@@ -100,6 +100,27 @@ const MyProperties = () => {
     }
   };
   
+  const handleDeleteProperty = async(address) =>{
+    console.log("this is the property address: ", address)
+    const deleteTourUrl = 'http://localhost:8090/del_property';
+        const response = await fetch(deleteTourUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                address: address
+            }),
+        });
+        
+        const responseDataPost = await response.json();
+        
+        if (response.ok) {
+            console.log('Message added successfully:', responseDataPost);
+        } else {
+            console.error('Error adding message:', responseDataPost.error);
+        }
+  }
 
   const handleCardClick = (index) => {
     if (expandedCard === index) {
@@ -163,10 +184,18 @@ const MyProperties = () => {
                             onChange={(e) => setEmail(e.target.value)} // Update the email state when the user types
                           />
                         </Form.Group>
-                        <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                          Submit
-                        </button>
+                        <div className="flex justify-between items-center mb-3 py-5">
+                          <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                            Submit
+                          </button>
+                        </div>
                       </Form>
+                      <button
+                              className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                              onClick={() => handleDeleteProperty(card.property_address)}
+                            >
+                              Delete Property
+                      </button>
                   </div>
                 </div>
               )}

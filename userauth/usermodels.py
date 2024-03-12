@@ -377,8 +377,8 @@ class User:
         except HouseNotFoundException: #throww an exception for missing property (do not need this, just in case issues arise...
             print(f"House not found for address: {property}")
     
-    def delete_tour(self, property_address): #helper method used for delete_property()
-        user_instance = User().retrieve_user_info(property_address)
+    def delete_tour(self, username, property_address): #helper method used for delete_property()
+        user_instance = User().retrieve_user_info(username=username)
     
         for tour in user_instance.upcoming_tours:
             if tour["tour_address"] == property_address:
@@ -413,11 +413,14 @@ def retrieve_landlord_property_info(username):
     
 
 def delete_property(property_address):
-    house_instance = House().retrieve_house_info(property_address)
+    house_instance = House().retrieve_housing_info(property_address)
     #look at the landlord for any pending tours regarding address"
     property_owner = house_instance.property_owner
+    print(property_owner)
     property_owner_instance = User().retrieve_user_info(property_owner)
     owner_tours = property_owner_instance.upcoming_tours
+    property_owner_instance.my_properties.remove(property_address)
+    property_owner_instance.update_user_info()
     for tour in owner_tours:
         if tour["tour_address"] == property_address:
             property_owner_instance.upcoming_tours.remove(tour)

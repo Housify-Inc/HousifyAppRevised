@@ -7,14 +7,14 @@ ca = certifi.where()
 
 
 class Messages:
-    def __init__(self, text, timestamp, sender):
+    def __init__(self, text=None, timestamp=None, sender=None):
         self.text = text
         self.timestamp = timestamp
         self.sender = sender
 
 
 class Rooms:
-    def __init__(self, room_users, messages):
+    def __init__(self, room_users=None, messages=None):
         self.room_users = room_users
         self.messages = messages
 
@@ -44,8 +44,6 @@ class Rooms:
 
         room_data = self.to_dict()
         self.collection.insert_one(room_data)
-        room_data["_id"] = str(room_data["_id"])
-        return(room_data)
 
     def retrieve_room_info(self, id=None):
         self.client = MongoClient(
@@ -114,12 +112,28 @@ class Rooms:
             {"_id": ObjectId(id)},
             {"$push": {"messages": {"text": new_message.text, "timestamp": new_message.timestamp, "sender": new_message.sender}}}
         )
-       
+
+    def delete_group_chat(self, address):
+        self.client = MongoClient(
+            "mongodb+srv://housify-customer-account-test1:housify-customer-test1@directmessages.xzfffoj.mongodb.net/",
+            tlsCaFile=ca,
+        )
+        self.db = self.client.DM
+        self.collection = self.db.DirectMessages
+        self.collection.delete_one({"room_users": address})
+
+    def delete_dm_chat(self, user):
+        self.client = MongoClient(
+            "mongodb+srv://housify-customer-account-test1:housify-customer-test1@directmessages.xzfffoj.mongodb.net/",
+            tlsCaFile=ca,
+        )
+        self.db = self.client.DM
+        self.collection = self.db.DirectMessages
+        self.collection.delete_many({"room_users": user})
+        print("deleted room for user: " + user)
 
 
     def print_room_info(self):
         print("Room Information")
         print(f"Room Users: {self.room_users}")
-        print(f"Message Text: {self.messages.text}")
-        print(f"Message Timestamp: {self.messages.timestamp}")
-        print(f"Sender: {self.messages.sender}")
+        print(f"Message Text: {self.messages}")
