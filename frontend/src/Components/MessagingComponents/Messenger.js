@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { getResponseData } from "../ResponseHandler";
+import { getResponseData } from "../../ResponseHandler";
 
 // import {Auth} from './Auth'
 import { Chat } from "./Chat";

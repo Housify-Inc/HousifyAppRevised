@@ -2,8 +2,8 @@ import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { Fragment, useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
-import Cards from '../Components/AvailableHousing';
-import Groups from '../Components/Groups';
+import Cards from '../Components/TenantComponents/AvailableHousing';
+import Groups from '../Components/TenantComponents/Groups';
 import Tours from '../Components/MyTours';
 import { getResponseData } from '../ResponseHandler';
 

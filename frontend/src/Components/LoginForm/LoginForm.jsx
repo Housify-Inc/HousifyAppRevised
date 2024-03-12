@@ -86,11 +86,6 @@ const LoginForm = () => {
                     />
                     <FaLock className="icon"/>
                 </div>
-                <div className="remember-forgot">
-                    <label><input type="checkbox"></input>Remember me</label>
-                    <Link to="/forgot-password">Forgot password?</Link>
-                </div>
-
                 <button type="submit">Login</button>
 
                 <div className="register-link">

@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Form from 'react-bootstrap/Form';
-import data from './data';
 import PropertyForm from './PropertyForm';
-import { getResponseData } from '../ResponseHandler';
+import { getResponseData } from '../../ResponseHandler';
 import { Spinner } from 'react-bootstrap';
 
 const MyProperties = () => {

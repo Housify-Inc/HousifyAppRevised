@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { getResponseData } from "../ResponseHandler";
+import { getResponseData } from "../../ResponseHandler";
 
 export const GroupChat = (props) => {
     const responseData = getResponseData();
@@ -27,9 +27,9 @@ export const GroupChat = (props) => {
           console.log(roomData._id);
           setMessages(roomData.messages)
 
-          // const intervalId = setInterval(() => {
-          //   handleRoom();
-          // }, 5000); // Fetch data every 5 seconds (adjust as needed)
+          const intervalId = setInterval(() => {
+            handleRoom();
+          }, 5000); // Fetch data every 5 seconds (adjust as needed)
       };
 
       handleRoom();

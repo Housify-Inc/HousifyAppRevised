@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getResponseData} from '../ResponseHandler';
+import { getResponseData} from '../../ResponseHandler';
 import { Spinner } from 'react-bootstrap';
 
 const Cards = () => {

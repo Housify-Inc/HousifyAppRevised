@@ -2,8 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LoginForm from './Components/LoginForm/LoginForm';
 import RegisterForm from './Components/RegisterForm/RegisterForm';
-import ForgotPasswordForm from './Components/ForgotPasswordForm/ForgotPasswordForm';
-import HomePage from './Components/HomePage/HomePage';
 import TenantDashboard from './Pages/TenantDashboard';
 import LandloardDashboard from './Pages/LandloardDashboard';
 
@@ -21,7 +19,6 @@ function App() {
       <Routes>
         <Route path="/" element={<LoginForm />} />
         <Route path="/register" element={<RegisterForm />} />
-        <Route path="/forgot-password" element={<ForgotPasswordForm />} />
         <Route path="/tenant-home" element ={<TenantDashboard/>} />
         <Route path="/landlord-home" element ={<LandloardDashboard/>} />
         <Route path="" element={<LoginForm />} />

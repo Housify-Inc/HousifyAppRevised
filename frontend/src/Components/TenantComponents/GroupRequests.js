@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from 'react-bootstrap';
-import { getResponseData, updateUser } from '../ResponseHandler';
+import { getResponseData, updateUser } from '../../ResponseHandler';
 
 const PendingRequests = () => {
   const [pendingRequests, setPendingRequests] = useState([]);

@@ -3,7 +3,7 @@ import { Button, Form } from 'react-bootstrap';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col'; // Import Col for better control over the layout
 import { UserCircleIcon, PhotoIcon } from '@heroicons/react/24/solid'; // Import Heroicons icons
-import { getResponseData } from '../ResponseHandler';
+import { getResponseData } from '../../ResponseHandler';
 
 function PropertyForm() {
     const responseData = getResponseData();
@@ -133,19 +133,19 @@ function PropertyForm() {
                     <Row className="mb-3">
                         <Col>
                             <Form.Group className="mb-3" controlId="available">
-                                <Form.Check className="form-check" type="checkbox" label="Available" name="available" checked={formData.available} onChange={handleInputChange} />
+                                <Form.Check className="form-check" type="checkbox" label="  Available" name="available" checked={formData.available} onChange={handleInputChange} />
                             </Form.Group>
                         </Col>
 
                         <Col>
                             <Form.Group className="mb-3" controlId="laundry">
-                                <Form.Check className="form-check" type="checkbox" label="Laundry Available" name="laundry" checked={formData.laundry} onChange={handleInputChange} />
+                                <Form.Check className="form-check" type="checkbox" label="  Laundry Available" name="laundry" checked={formData.laundry} onChange={handleInputChange} />
                             </Form.Group>
                         </Col>
 
                         <Col>
                             <Form.Group className="mb-3" controlId="pet_friendly">
-                                <Form.Check className="form-check" type="checkbox" label="Pet Friendly" name="pet_friendly" checked={formData.pet_friendly} onChange={handleInputChange} />
+                                <Form.Check className="form-check" type="checkbox" label="  Pet Friendly" name="pet_friendly" checked={formData.pet_friendly} onChange={handleInputChange} />
                             </Form.Group>
                         </Col>
                     </Row>

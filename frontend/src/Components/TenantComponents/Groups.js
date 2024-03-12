@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faComment, faMoneyBill } from '@fortawesome/free-solid-svg-icons';
-import Messenger from './Messenger';
+import Messenger from '../MessagingComponents/Messenger';
 import PendingRequests from './GroupRequests';
-import { getResponseData } from '../ResponseHandler';
-import GroupMessaging from './GroupMessaging';
+import { getResponseData } from '../../ResponseHandler';
+import GroupMessaging from '../MessagingComponents/GroupMessaging';
 import { Spinner } from 'react-bootstrap';
 
 const UserTable = () => {
