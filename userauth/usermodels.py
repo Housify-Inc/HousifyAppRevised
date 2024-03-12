@@ -361,6 +361,36 @@ class User:
         landlord_instance.update_user_info()
         user_instance.update_user_info()
 
+def remove_user_and_house_from_group(self, username):
+        """
+        Remove the user from their housing_group and then remove the user from
+        the corresponding HouseInfo's all_housemates list.
+
+        Parameters:
+        - username_to_remove (str): The username of the user to remove.
+
+        Raises:
+        - HouseNotFoundException: If the user's housing_group is empty or the property address is not found in the HouseInfo database.
+        """
+        # Ensure the user has a housing group
+        if not self.housing_group:
+            raise HouseNotFoundException(f"No housing group found for user {self.username}")
+
+        # Get the property address from the user's housing group
+        address = self.housing_group
+        self.housing_group = None 
+        self.update_user_info()
+
+        try:
+            house_instance = House().retrieve_housing_info(address)
+            if username in house_instance.group.all_housemates:
+                house_instance.group.all_housemates.remove(username)
+                house_instance.update_housing_info()
+            else:
+                raise UserNotFoundException(f"User {username} not found in house {property}")
+        except HouseNotFoundException: #throww an exception for missing property (do not need this, just in case issues arise...
+            print(f"House not found for address: {property}")
+
 def retrieve_landlord_property_info(username):
     # Retrieve the user information
     user_info = User().retrieve_user_info(username)
