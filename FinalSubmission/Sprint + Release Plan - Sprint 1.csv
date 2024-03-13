@@ -1,0 +1,9 @@
+Epic,User Stories,Story Points,Leading,Developers,Sprint Deadline,Status,Comments
+DATABASE & BACKEND FRAMEWORK,"As a user, I would like to know that my data is securely stored and accessed efficiently for ease-of-use",2,Aravind Nair (21aravindnair@gmail.com),Aravind Nair ,Sprint 1,Finalized,
+WEBPAGE USER INTERFACE,"As a user, I would like to able to see a pleasing and convenient UI when signing up.",3,Rahul Ganesh (rahul.ganesh.work@gmail.com),rahul ganesh,Sprint 1,Finalized,
+WEBPAGE USER INTERFACE,"As a landlord user, I would like to see a pleasing and convenient UI when doing my business needs.",2,Krish Praseeth (krish.praseeth@gmail.com),sadeshara26@gmail.com krish.praseeth@gmail.com,Sprint 1,Finalized,
+WEBPAGE USER INTERFACE,"As a tenant user, I would like to see a pleasing and convenient UI when conducting my housing needs.",2,Krish Praseeth (krish.praseeth@gmail.com),sadeshara26@gmail.com krish.praseeth@gmail.com,Sprint 1,Finalized,
+WEBPAGE USER INTERFACE,"As a user, I would like to see that all pages of the web app all connect to each other and have no fundamental flaws in page routing.",1,Shivam Adeshara (sadeshara26@gmail.com),sadeshara26@gmail.com krish.praseeth@gmail.com,Sprint 1,Finalized,
+USER AUTHENTICATION,"As a user, I would like to know that my login credentials can help me get into my app and my data",3,Rahul Ganesh (rahul.ganesh.work@gmail.com), rahul.ganesh.work@gmail.com sadeshara26@gmail.com,Sprint 1,Finalized,
+USER AUTHENTICATION,"As a user, I would like to know that my login credentials are kept securely.",3,Rahul Ganesh (rahul.ganesh.work@gmail.com),rahul.ganesh.work@gmail.com ,Sprint 1,Finalized,
+,,Total: 16,,,,,

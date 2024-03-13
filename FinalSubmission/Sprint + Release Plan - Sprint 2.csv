@@ -1,0 +1,5 @@
+Epic,User Stories,Story Points,Leading,Developers,Sprint Deadline,Status,Comments
+DATABASE & BACKEND FRAMEWORK,"As a user, I would like to know that my payment information is kept securely in databases.",3,Rahul Ganesh (rahul.ganesh.work@gmail.com),Aravind Nair rahul.ganesh.work@gmail.com,Sprint 2,Finalized,"Issues with Stripe API; moving to PayPal API. Testing Square, Plaid, etc. if PayPal fails"
+PEER-TO-PEER PAYMENT FEATURE,"A a tenant user, I would like to be able to pay my landlord the rent that's due.",5,Aravind Nair (21aravindnair@gmail.com),Aravind Nair,Sprint 2,Finalized,Moved Up
+PEER-TO-PEER PAYMENT FEATURE,"As a landlord user, I would like to ensure a smooth process for me to get my money from my tenants.",5,Aravind Nair (21aravindnair@gmail.com),Aravind Nair ,Sprint 2,Finalized,Moved Up
+PEER-TO-PEER PAYMENT FEATURE,"As a general user, I would like to ensure that the payment process is smoothly and lacking any glitches or latency.",1,Aravind Nair (21aravindnair@gmail.com),Aravind Nair ,Sprint 2,Finalized,Moved Up
