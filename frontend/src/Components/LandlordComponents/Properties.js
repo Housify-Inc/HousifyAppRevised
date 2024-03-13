@@ -185,7 +185,7 @@ const MyProperties = () => {
                         </Form.Group>
                         <div className="flex justify-between items-center mb-3 py-5">
                             {submittedCardIndex === index && (
-                              <div className="text-green-500 font-bold mb-3">User added to group successfully!</div>
+                              <div className="text-green-500 font-bold mb-3">Request to Join Group Sent</div>
                             )}
                           <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                             Submit
