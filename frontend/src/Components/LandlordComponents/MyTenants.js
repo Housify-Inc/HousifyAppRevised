@@ -8,7 +8,6 @@ import { Spinner } from 'react-bootstrap';
 
 const Tenants = () => {
     const responseData = getResponseData();
-    const [showPaymentForm, setShowPaymentForm] = useState(false);
     const [showMessenger, setShowMessenger] = useState(false);
     const [users, setUsers] = useState([]);
     const [noUsers, setnoUsers] = useState(true);
@@ -19,7 +18,7 @@ const Tenants = () => {
 
     useEffect(() => {
         const handleGroup = async () => {
-            if (!responseData.my_properties) {
+            if (responseData.my_properties.length === 0) {
                 setIsLoading(false); // Set loading to false if there are no housing groups
                 return;
             }
@@ -51,7 +50,7 @@ const Tenants = () => {
             setIsLoading(false); // Set loading to false after data is fetched
         };
         handleGroup();
-    }, [responseData.my_properties]);
+    });
     
     const handleMessageClick = (user) => {
         setShowMessenger(!showMessenger);
@@ -110,7 +109,7 @@ const Tenants = () => {
     }
 
 
-    if (noUsers) {
+    if (responseData.my_properties.length === 0) {
         return(
         <div className="flex justify-center items-start h-screen">
             <div className="max-w-98 px-10">

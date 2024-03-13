@@ -116,8 +116,8 @@ const Cards = () => {
                 <div className="expanded-view">
                   <p>Bedrooms: {card.real_estate.details.bedroom_count}</p>
                   <p>Bathrooms: {card.real_estate.details.bathroom_count}</p>
-                  <p>Laundry: {card.real_estate.laundry ? 'Yes' : 'No'}</p>
-                  <p>Pet Friendly: {card.real_estate.pet_friendly ? 'Yes' : 'No'}</p>
+                  <p>Laundry: {card.real_estate.details.laundry ? 'Yes' : 'No'}</p>
+                  <p>Pet Friendly: {card.real_estate.details.pet_friendly ? 'Yes' : 'No'}</p>
                   <p>Rent Price: {card.real_estate.rent_price}</p>
                   <p>Owner Contact Info: {card.real_estate.property_owner}</p>
                   {/* Add more information as needed */}

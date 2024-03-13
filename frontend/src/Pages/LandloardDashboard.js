@@ -2,7 +2,7 @@ import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { Fragment, useEffect, useState } from 'react'
 import { useNavigate } from "react-router-dom"
-import Tenants from '../Components/LoginForm/MyTenants'
+import Tenants from '../Components/LandlordComponents/MyTenants'
 import Tours from '../Components/MyTours'
 import Cards from "../Components/LandlordComponents/Properties"
 import { getResponseData } from '../ResponseHandler'
